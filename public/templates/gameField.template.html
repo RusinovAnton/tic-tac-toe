@@ -1,3 +1,16 @@
-<div class="game-field">
-
+<div class="game-field-wrapper">
+    <div class="game-field">
+        <div class="row" ng-repeat="row in $ctrl.grid.cells">
+            <field-cell ng-repeat="item in row track by $index" x="$index" y="$parent.$index"></field-cell>
+        </div>
+    </div>
+    <div ng-if='$ctrl.gameEnded' class="game-end">
+        <h1>GAME IS OVER NOW</h1>
+        <p class="p game-end--message">
+            You {{$ctrl.gameStatus}}!
+        </p>
+        <a href="#!/new" class="btn btn-blue">
+            Play again
+        </a>
+    </div>
 </div>

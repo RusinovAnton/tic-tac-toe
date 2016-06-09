@@ -61,25 +61,40 @@
 	
 	var _angularRoute2 = _interopRequireDefault(_angularRoute);
 	
-	var _gameField = __webpack_require__(6);
+	var _game = __webpack_require__(6);
+	
+	var _game2 = _interopRequireDefault(_game);
+	
+	var _gameNew = __webpack_require__(7);
+	
+	var _gameNew2 = _interopRequireDefault(_gameNew);
+	
+	var _gameField = __webpack_require__(9);
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
+	var _fieldCell = __webpack_require__(12);
+	
+	var _fieldCell2 = _interopRequireDefault(_fieldCell);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	_angular2.default.module('ticTacToe', ['gameFieldModule', 'ngRoute']).controller('gameController', function gameController($scope) {
-	    console.log($scope);
-	}).config(['$locationProvider', '$routeProvider', function config($locationProvider, $routeProvider) {
-	    $locationProvider.hashPrefix('!');
+	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field', 'cell']).controller('gameController', _game2.default);
 	
-	    $routeProvider.when('/play', {
+	_angular2.default.module('ticTacToe').config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
+	    $locationProvider.hashPrefix('!');
+	    $routeProvider.when('/new', {
+	        template: '<game-new></game-new>'
+	    }).when('/play', {
 	        template: '<game-field></game-field>'
-	    }).when('/new', {
-	        template: '<start-game></start-game>'
-	    }).when('/end', {
-	        template: '<game-over></game-over>'
-	    });
+	    }).otherwise('/new');
 	}]);
+	
+	_angular2.default.module('start', []).component('gameNew', _gameNew2.default);
+	
+	_angular2.default.module('field', []).component('gameField', _gameField2.default);
+	
+	_angular2.default.module('cell', []).component('fieldCell', _fieldCell2.default);
 
 /***/ },
 /* 2 */
@@ -32165,6 +32180,26 @@
 
 /***/ },
 /* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var gameFieldController = function gameFieldController($scope) {
+	    _classCallCheck(this, gameFieldController);
+	
+	    console.log($scope);
+	};
+	
+	exports.default = gameFieldController;
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32173,20 +32208,195 @@
 	    value: true
 	});
 	
-	var _angular = __webpack_require__(2);
+	var _gameNew = __webpack_require__(8);
 	
-	var _angular2 = _interopRequireDefault(_angular);
+	var _gameNew2 = _interopRequireDefault(_gameNew);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var gameFieldModule = _angular2.default.module('gameFieldModule', []).component('gameField', {
-	    templateUrl: 'templates/gameField.template.html',
-	    controller: function controller($scope) {
-	        console.log($scope);
-	    }
+	var gameNewComponent = {
+	    templateUrl: 'templates/gameNew.template.html',
+	    controller: ['$scope', _gameNew2.default]
+	};
+	
+	exports.default = gameNewComponent;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
 	});
 	
-	exports.default = gameFieldModule;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var gameNewController = function gameNewController($scope) {
+	    _classCallCheck(this, gameNewController);
+	
+	    this.size = 3;
+	};
+	
+	exports.default = gameNewController;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _gameField = __webpack_require__(10);
+	
+	var _gameField2 = _interopRequireDefault(_gameField);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var gameFieldComponent = {
+	    templateUrl: 'templates/gameField.template.html',
+	    controller: ['$scope', _gameField2.default]
+	};
+	
+	exports.default = gameFieldComponent;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _Grid = __webpack_require__(11);
+	
+	var _Grid2 = _interopRequireDefault(_Grid);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var gameFieldController = function gameFieldController($scope) {
+	    _classCallCheck(this, gameFieldController);
+	
+	    this.grid = new _Grid2.default(3);
+	    this.gameStatus = 'WIN';
+	    this.gameEnded = true;
+	};
+	
+	exports.default = gameFieldController;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Grid = function () {
+	    function Grid(size, prevState) {
+	        _classCallCheck(this, Grid);
+	
+	        this.size = size;
+	        this.cells = [];
+	
+	        if (prevState === void 0) {
+	            this.empty();
+	        }
+	    }
+	
+	    _createClass(Grid, [{
+	        key: "empty",
+	        value: function empty() {
+	            var i, j;
+	            for (i = 0; i < this.size; i++) {
+	                this.cells[i] = [];
+	                for (j = 0; j < this.size; j++) {
+	                    // Empty cell
+	                    this.cells[i][j] = null;
+	                }
+	            }
+	        }
+	    }, {
+	        key: "fromState",
+	        value: function fromState() {}
+	    }]);
+	
+	    return Grid;
+	}();
+	
+	exports.default = Grid;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _fieldCell = __webpack_require__(13);
+	
+	var _fieldCell2 = _interopRequireDefault(_fieldCell);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var fieldCellComponent = {
+	    templateUrl: 'templates/fieldCell.template.html',
+	    controller: ['$scope', _fieldCell2.default],
+	    bindings: {
+	        x: '=',
+	        y: '='
+	    }
+	};
+	
+	exports.default = fieldCellComponent;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var fieldCellController = function () {
+	    function fieldCellController($scope) {
+	        _classCallCheck(this, fieldCellController);
+	    }
+	
+	    _createClass(fieldCellController, [{
+	        key: "handleCellClick",
+	        value: function handleCellClick(pos) {
+	            console.log(pos);
+	        }
+	    }]);
+	
+	    return fieldCellController;
+	}();
+	
+	exports.default = fieldCellController;
 
 /***/ }
 /******/ ]);

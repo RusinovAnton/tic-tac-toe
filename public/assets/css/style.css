@@ -1,6 +1,75 @@
-.cell {
-    width: 30px;
+body {
+    font-family: 'Roboto';
+}
+
+main {
+    text-align: center;
+}
+
+main > .container {
+    display: inline-block;
+}
+
+.game-field .row {
+    font-size: 0;
+}
+
+.field--cell {
+    display: inline-block;
+    font-size: 20px;
+    width: 40px;
     height: 40px;
     margin: 3px;
-    border: 1px solid #fc0fc0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.4);
+    overflow: hidden;
+}
+
+.btn {
+    display: inline-block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    color: #222;
+    cursor: pointer;
+    padding: 0 10px;
+    border-radius: 3px;
+    box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.4);
+    background: #ddd;
+    text-transform: uppercase;
+    text-decoration: none;
+    line-height: 34px;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s ;
+    -ms-transition: all 0.3s ;
+    -o-transition: all 0.3s ;
+    transition: all 0.3s ;
+}
+
+.btn:active {
+    box-shadow: 0 0 0 0 rgba(0,0,0,0.3);
+}
+
+.btn.btn-red {
+    color: #fff;
+    background: #ff5653;
+}
+
+.btn.btn-blue {
+    color: #fff;
+    background: #4fc8ff;
+}
+
+.game-end {
+    position: fixed;
+    background: rgba(255,255,255,0.8);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.m-b {
+    margin-bottom: 15px;
 }
