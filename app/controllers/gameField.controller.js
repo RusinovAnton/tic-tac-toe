@@ -6,8 +6,6 @@ let ENEMY_SIGN = '0';
 export default class gameFieldController {
     constructor($scope, $routeParams) {
 
-        console.log($routeParams.size);
-
         this.size = $routeParams.size || 3;
         this.gridLoaded = false;
 
@@ -20,12 +18,22 @@ export default class gameFieldController {
     }
 
     handleMove(pos) {
-        const sign = this.playerMove ?
+
+        // Do nothing if choosen cell isn't empty already
+        if (this.grid.cells[pos.y][pos.x] !== null) return;
+
+        // Do nothing if game ended
+        if (this.gameEnded) return;
+
+        this.grid.cells[pos.y][pos.x] = this.playerMove ?
             PLAYER_SIGN
             : ENEMY_SIGN;
 
-        this.grid.cells[pos.y][pos.x] = sign;
+        console.log(this.grid.cells);
+
+        // Change move turn
         this.playerMove = !this.playerMove;
+
     }
 
     initGrid($scope) {
@@ -34,7 +42,6 @@ export default class gameFieldController {
             resolve(new Grid(this.size));
             reject();
         }).then(function (grid) {
-                console.log(grid);
                 _self.grid = grid;
                 _self.gridLoaded = true;
                 $scope.$apply();

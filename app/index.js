@@ -1,8 +1,6 @@
 import angular                  from 'angular';
 import ngRoute                  from 'angular-route';
 
-import gameController           from './controllers/game.controller';
-
 import gameNewComponent         from './components/gameNew.component';
 import gameFieldComponent       from './components/gameField.component';
 import fieldCellComponent       from './components/fieldCell.component';
@@ -13,8 +11,7 @@ angular
         'ngRoute',
         'start',
         'field'
-    ])
-    .controller('gameController', gameController);
+    ]);
 
 angular
     .module('ticTacToe')
