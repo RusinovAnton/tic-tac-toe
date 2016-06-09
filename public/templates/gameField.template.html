@@ -1,4 +1,4 @@
-<div class="game-field-wrapper" ng-init='newGameLink = "#!/new?size={{$ctrl.size}}"'>
+<div class="game-field-wrapper" ng-init='newGameLink = "#!/new?size=" + $ctrl.size'>
     <span class="animate-spin" ng-if="!$ctrl.gridLoaded">
         <i class="fa fa-spinner"></i>
     </span>
