@@ -2,11 +2,26 @@
     <span class="animate-spin" ng-if="!$ctrl.gridLoaded">
         <i class="fa fa-spinner"></i>
     </span>
-    <div class="game-field m-b" ng-model="$ctrl.grid">
-        <div class="row" ng-repeat="row in $ctrl.grid.cells">
-            <field-cell ng-repeat="item in row track by $index" body="item" x="$index" y="$parent.$index" on-move="$ctrl.handleMove(pos)"></field-cell>
+
+    <div class="row-flex">
+        <div class="col">
+            <game-info player-move="$ctrl.playerMove" player-sign="$ctrl.signs.player" enemy-sign="$ctrl.signs.enemy"></game-info>
+        </div>
+        <div class="col">
+            <div class="game-field m-b" ng-model="$ctrl.grid">
+                <div class="row" ng-repeat="row in $ctrl.grid.cells">
+                    <field-cell ng-repeat="item in row track by $index" body="item" x="$index" y="$parent.$index" on-move="$ctrl.handleMove(pos)"></field-cell>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <button class="btn btn-red" ng-click="$ctrl.endGame()" title="End game"><i class="fa fa-times"></i></button>
         </div>
     </div>
+
+
+
+
     <a href="{{newGameLink}}" class="btn btn-blue">
         Reset game<i class="fa fa-reply"></i>
     </a>

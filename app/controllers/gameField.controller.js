@@ -1,4 +1,5 @@
 import Grid from '../Grid';
+import GameStorage from '../storage/game.storage';
 
 let PLAYER_SIGN = 'x';
 let ENEMY_SIGN = '0';
@@ -6,15 +7,48 @@ let ENEMY_SIGN = '0';
 export default class gameFieldController {
     constructor($scope, $routeParams) {
 
-        this.size = $routeParams.size || 3;
+        this._scope = $scope;
+        this.params = $routeParams;
+        this.store = new GameStorage();
         this.gridLoaded = false;
 
         this.initGrid($scope);
 
-        this.playerMove = false;
+        this.signs = {
+            player: PLAYER_SIGN,
+            enemy: ENEMY_SIGN
+        };
+
+        this.playerMove = true;
 
         this.gameStatus = 'WIN';
         this.gameEnded = false;
+
+
+
+        console.log(this);
+    }
+
+    initGrid($scope) {
+        var _self = this;
+
+        var prevState = this.store.state;
+
+        if (this.params.size !== prevState.size) this.store.clearState();
+
+        this.size = this.params.size || 3;
+
+        return new Promise((resolve, reject)=> {
+            resolve(new Grid(this.size));
+            reject();
+        }).then(function (grid) {
+                _self.grid = grid;
+                _self.gridLoaded = true;
+                _self._scope.$apply();
+            })
+            .catch((err)=> {
+                console.log(err);
+            });
     }
 
     handleMove(pos) {
@@ -29,25 +63,17 @@ export default class gameFieldController {
             PLAYER_SIGN
             : ENEMY_SIGN;
 
-        console.log(this.grid.cells);
-
         // Change move turn
         this.playerMove = !this.playerMove;
 
+        this.store.state = {
+            size: this.size,
+            grid: this.grid.cells
+        }
+
     }
 
-    initGrid($scope) {
-        var _self = this;
-        return new Promise((resolve, reject)=> {
-            resolve(new Grid(this.size));
-            reject();
-        }).then(function (grid) {
-                _self.grid = grid;
-                _self.gridLoaded = true;
-                $scope.$apply();
-            })
-            .catch((err)=> {
-                console.log(err);
-            });
+    endGame(){
+        this.gameEnded = true;
     }
 }

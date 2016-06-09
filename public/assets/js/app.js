@@ -65,11 +65,15 @@
 	
 	var _gameNew2 = _interopRequireDefault(_gameNew);
 	
-	var _gameField = __webpack_require__(8);
+	var _gameInfo = __webpack_require__(8);
+	
+	var _gameInfo2 = _interopRequireDefault(_gameInfo);
+	
+	var _gameField = __webpack_require__(9);
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
-	var _fieldCell = __webpack_require__(11);
+	var _fieldCell = __webpack_require__(13);
 	
 	var _fieldCell2 = _interopRequireDefault(_fieldCell);
 	
@@ -77,7 +81,12 @@
 	
 	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field']);
 	
-	_angular2.default.module('ticTacToe').config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
+	_angular2.default.module('ticTacToe').filter('debug', function () {
+	    return function (input) {
+	        if (input === '') return 'empty string';
+	        return input ? input : '' + input;
+	    };
+	}).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
 	    $locationProvider.hashPrefix('!');
 	    $routeProvider.when('/new', {
 	        template: '<game-new></game-new>'
@@ -88,7 +97,9 @@
 	
 	_angular2.default.module('start', []).component('gameNew', _gameNew2.default);
 	
-	_angular2.default.module('field', ['cell']).component('gameField', _gameField2.default);
+	_angular2.default.module('field', ['info', 'cell']).component('gameField', _gameField2.default);
+	
+	_angular2.default.module('info', []).component('gameInfo', _gameInfo2.default);
 	
 	_angular2.default.module('cell', []).component('fieldCell', _fieldCell2.default);
 
@@ -32221,6 +32232,26 @@
 
 /***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var gameInfoComponent = {
+	    templateUrl: 'templates/gameInfo.template.html',
+	    bindings: {
+	        playerMove: "<",
+	        playerSign: "<",
+	        enemySign: "<"
+	    }
+	};
+	
+	exports.default = gameInfoComponent;
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32229,7 +32260,7 @@
 	    value: true
 	});
 	
-	var _gameField = __webpack_require__(9);
+	var _gameField = __webpack_require__(10);
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
@@ -32243,7 +32274,7 @@
 	exports.default = gameFieldComponent;
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32254,9 +32285,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Grid = __webpack_require__(10);
+	var _Grid = __webpack_require__(11);
 	
 	var _Grid2 = _interopRequireDefault(_Grid);
+	
+	var _game = __webpack_require__(12);
+	
+	var _game2 = _interopRequireDefault(_game);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -32269,18 +32304,51 @@
 	    function gameFieldController($scope, $routeParams) {
 	        _classCallCheck(this, gameFieldController);
 	
-	        this.size = $routeParams.size || 3;
+	        this._scope = $scope;
+	        this.params = $routeParams;
+	        this.store = new _game2.default();
 	        this.gridLoaded = false;
 	
 	        this.initGrid($scope);
 	
-	        this.playerMove = false;
+	        this.signs = {
+	            player: PLAYER_SIGN,
+	            enemy: ENEMY_SIGN
+	        };
+	
+	        this.playerMove = true;
 	
 	        this.gameStatus = 'WIN';
 	        this.gameEnded = false;
+	
+	        console.log(this);
 	    }
 	
 	    _createClass(gameFieldController, [{
+	        key: 'initGrid',
+	        value: function initGrid($scope) {
+	            var _this = this;
+	
+	            var _self = this;
+	
+	            var prevState = this.store.state;
+	
+	            if (this.params.size !== prevState.size) this.store.clearState();
+	
+	            this.size = this.params.size || 3;
+	
+	            return new Promise(function (resolve, reject) {
+	                resolve(new _Grid2.default(_this.size));
+	                reject();
+	            }).then(function (grid) {
+	                _self.grid = grid;
+	                _self.gridLoaded = true;
+	                _self._scope.$apply();
+	            }).catch(function (err) {
+	                console.log(err);
+	            });
+	        }
+	    }, {
 	        key: 'handleMove',
 	        value: function handleMove(pos) {
 	
@@ -32292,27 +32360,18 @@
 	
 	            this.grid.cells[pos.y][pos.x] = this.playerMove ? PLAYER_SIGN : ENEMY_SIGN;
 	
-	            console.log(this.grid.cells);
-	
 	            // Change move turn
 	            this.playerMove = !this.playerMove;
+	
+	            this.store.state = {
+	                size: this.size,
+	                grid: this.grid.cells
+	            };
 	        }
 	    }, {
-	        key: 'initGrid',
-	        value: function initGrid($scope) {
-	            var _this = this;
-	
-	            var _self = this;
-	            return new Promise(function (resolve, reject) {
-	                resolve(new _Grid2.default(_this.size));
-	                reject();
-	            }).then(function (grid) {
-	                _self.grid = grid;
-	                _self.gridLoaded = true;
-	                $scope.$apply();
-	            }).catch(function (err) {
-	                console.log(err);
-	            });
+	        key: 'endGame',
+	        value: function endGame() {
+	            this.gameEnded = true;
 	        }
 	    }]);
 	
@@ -32322,7 +32381,7 @@
 	exports.default = gameFieldController;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -32344,6 +32403,8 @@
 	
 	        if (prevState === void 0) {
 	            this.empty();
+	        } else {
+	            this.fromState(prevState);
 	        }
 	    }
 	
@@ -32361,7 +32422,7 @@
 	        }
 	    }, {
 	        key: "fromState",
-	        value: function fromState() {}
+	        value: function fromState(state) {}
 	    }]);
 	
 	    return Grid;
@@ -32370,8 +32431,8 @@
 	exports.default = Grid;
 
 /***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/* 12 */
+/***/ function(module, exports) {
 
 	'use strict';
 	
@@ -32379,15 +32440,48 @@
 	    value: true
 	});
 	
-	var _fieldCell = __webpack_require__(12);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _fieldCell2 = _interopRequireDefault(_fieldCell);
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var GameStorage = function () {
+	    function GameStorage() {
+	        _classCallCheck(this, GameStorage);
 	
+	        this.storage = window.localStorage || false;
+	    }
+	
+	    _createClass(GameStorage, [{
+	        key: 'clearState',
+	        value: function clearState() {
+	            this.storage.clear();
+	        }
+	    }, {
+	        key: 'state',
+	        set: function set(state) {
+	            this.storage.setItem('state', JSON.stringify(state));
+	        },
+	        get: function get() {
+	            return JSON.parse(this.storage.getItem('state'));
+	        }
+	    }]);
+	
+	    return GameStorage;
+	}();
+	
+	exports.default = GameStorage;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
 	var fieldCellComponent = {
 	    templateUrl: 'templates/fieldCell.template.html',
-	    controller: ['$scope', _fieldCell2.default],
 	    bindings: {
 	        x: '<',
 	        y: '<',
@@ -32397,24 +32491,6 @@
 	};
 	
 	exports.default = fieldCellComponent;
-
-/***/ },
-/* 12 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var fieldCellController = function fieldCellController($scope) {
-	    _classCallCheck(this, fieldCellController);
-	};
-	
-	exports.default = fieldCellController;
 
 /***/ }
 /******/ ]);

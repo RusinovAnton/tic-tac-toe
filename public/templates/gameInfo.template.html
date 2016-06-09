@@ -1,0 +1,13 @@
+<div class="game-info">
+    <div class="turn">
+        {{$ctrl.playerMove ? 'Your move' : 'Enemy move'}}
+    </div>
+    <div class="signs">
+        <p>
+            Your sign: {{$ctrl.playerSign|debug}}
+        </p>
+        <p>
+            Enemy's sign: {{$ctrl.enemySign|debug}}
+        </p>
+    </div>
+</div>

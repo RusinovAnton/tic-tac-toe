@@ -5,6 +5,8 @@ class Grid {
 
         if (prevState === void 0) {
             this.empty();
+        } else {
+            this.fromState(prevState)
         }
     }
 
@@ -19,7 +21,7 @@ class Grid {
         }
     }
 
-    fromState() {
+    fromState(state) {
 
     }
 }
