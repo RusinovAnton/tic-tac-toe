@@ -1,7 +1,7 @@
 import Grid from '../Grid';
 
 let PLAYER_SIGN = 'x';
-let ENEMY_SIGN = 'y';
+let ENEMY_SIGN = '0';
 
 export default class gameFieldController {
     constructor($scope, $routeParams) {
@@ -13,7 +13,7 @@ export default class gameFieldController {
 
         this.initGrid($scope);
 
-        this.playerMove = true;
+        this.playerMove = false;
 
         this.gameStatus = 'WIN';
         this.gameEnded = false;
@@ -25,6 +25,7 @@ export default class gameFieldController {
             : ENEMY_SIGN;
 
         this.grid.cells[pos.y][pos.x] = sign;
+        this.playerMove = !this.playerMove;
     }
 
     initGrid($scope) {

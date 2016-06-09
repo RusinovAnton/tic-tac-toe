@@ -32287,7 +32287,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var PLAYER_SIGN = 'x';
-	var ENEMY_SIGN = 'y';
+	var ENEMY_SIGN = '0';
 	
 	var gameFieldController = function () {
 	    function gameFieldController($scope, $routeParams) {
@@ -32300,7 +32300,7 @@
 	
 	        this.initGrid($scope);
 	
-	        this.playerMove = true;
+	        this.playerMove = false;
 	
 	        this.gameStatus = 'WIN';
 	        this.gameEnded = false;
@@ -32312,6 +32312,7 @@
 	            var sign = this.playerMove ? PLAYER_SIGN : ENEMY_SIGN;
 	
 	            this.grid.cells[pos.y][pos.x] = sign;
+	            this.playerMove = !this.playerMove;
 	        }
 	    }, {
 	        key: 'initGrid',
