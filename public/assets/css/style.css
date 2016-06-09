@@ -1,3 +1,29 @@
+@keyframes spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+[disabled] {
+    background: #ccc!important;
+    color: #eee!important;
+    pointer-events: none!important;
+}
+
+:focus {
+    outline: 0!important;
+}
+
+.animate-spin {
+    -webkit-animation:spin infinite 0.3s;
+    -o-animation:spin infinite 0.3s;
+    animation:spin infinite 0.3s;
+}
+
 body {
     font-family: 'Roboto';
 }
@@ -11,7 +37,16 @@ main > .container {
 }
 
 .game-field .row {
+    white-space: nowrap;
     font-size: 0;
+}
+
+.field-size-input {
+    width: 70px;
+    height: 34px;
+    font-size: 20px;
+    text-align: center;
+    border: 1px solid #ccc;
 }
 
 .field--cell {
@@ -72,4 +107,8 @@ main > .container {
 
 .m-b {
     margin-bottom: 15px;
+}
+
+input.ng-invalid {
+    border-color: #f00;
 }

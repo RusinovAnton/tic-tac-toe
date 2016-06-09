@@ -1,8 +1,22 @@
 <div>
     <div class="btn-wrap m-b">
-        <a href="#!/play" class="btn btn-red">
-            Play the game!
+        <a href="#!/play?size={{$ctrl.size}}" class="btn btn-red" ng-disabled="$ctrl.size !== parseInt($ctrl.size) && $ctrl.size < 3 || $ctrl.size > 100">
+            Play the game! <i class="fa fa-play"></i>
         </a>
     </div>
-    <input type="number" name="field[size]" ng-model="$ctrl.size">
+    <div class="form-group m-b">
+        <label for="fieldSize">
+            Field size:
+        </label>
+        <form name="gameStartForm">
+            <input type="number"
+               id="fieldSize"
+               name="field[size]"
+               class="field-size-input"
+               ng-model="$ctrl.size">
+        </form>
+    </div>
+    <div class="field-size" style="font-size: 28px" ng-if="$ctrl.size">
+        <span>{{$ctrl.size}}x{{$ctrl.size}}</span>
+    </div>
 </div>

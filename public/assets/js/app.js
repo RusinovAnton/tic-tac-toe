@@ -79,7 +79,7 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field', 'cell']).controller('gameController', _game2.default);
+	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field']).controller('gameController', _game2.default);
 	
 	_angular2.default.module('ticTacToe').config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
 	    $locationProvider.hashPrefix('!');
@@ -92,7 +92,7 @@
 	
 	_angular2.default.module('start', []).component('gameNew', _gameNew2.default);
 	
-	_angular2.default.module('field', []).component('gameField', _gameField2.default);
+	_angular2.default.module('field', ['cell']).component('gameField', _gameField2.default);
 	
 	_angular2.default.module('cell', []).component('fieldCell', _fieldCell2.default);
 
@@ -32190,13 +32190,13 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var gameFieldController = function gameFieldController($scope) {
-	    _classCallCheck(this, gameFieldController);
+	var gameController = function gameController($scope) {
+	    _classCallCheck(this, gameController);
 	
 	    console.log($scope);
 	};
 	
-	exports.default = gameFieldController;
+	exports.default = gameController;
 
 /***/ },
 /* 7 */
@@ -32216,28 +32216,44 @@
 	
 	var gameNewComponent = {
 	    templateUrl: 'templates/gameNew.template.html',
-	    controller: ['$scope', _gameNew2.default]
+	    controller: ['$scope', '$routeParams', _gameNew2.default]
 	};
 	
 	exports.default = gameNewComponent;
 
 /***/ },
 /* 8 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _angular = __webpack_require__(2);
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var gameNewController = function gameNewController($scope) {
-	    _classCallCheck(this, gameNewController);
+	var gameNewController = function () {
+	    function gameNewController($scope, $routeParams) {
+	        _classCallCheck(this, gameNewController);
 	
-	    this.size = 3;
-	};
+	        this.size = parseInt($routeParams.size) || 3;
+	    }
+	
+	    _createClass(gameNewController, [{
+	        key: 'isValid',
+	        value: function isValid() {
+	            var size = this.size;
+	            return (0, _angular.isNumber)(size) && (size < 3 || size > 100);
+	        }
+	    }]);
+	
+	    return gameNewController;
+	}();
 	
 	exports.default = gameNewController;
 
@@ -32259,7 +32275,7 @@
 	
 	var gameFieldComponent = {
 	    templateUrl: 'templates/gameField.template.html',
-	    controller: ['$scope', _gameField2.default]
+	    controller: ['$scope', '$routeParams', _gameField2.default]
 	};
 	
 	exports.default = gameFieldComponent;
@@ -32274,6 +32290,8 @@
 	    value: true
 	});
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
 	var _Grid = __webpack_require__(11);
 	
 	var _Grid2 = _interopRequireDefault(_Grid);
@@ -32282,13 +32300,54 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var gameFieldController = function gameFieldController($scope) {
-	    _classCallCheck(this, gameFieldController);
+	var PLAYER_SIGN = '';
 	
-	    this.grid = new _Grid2.default(3);
-	    this.gameStatus = 'WIN';
-	    this.gameEnded = true;
-	};
+	var gameFieldController = function () {
+	    function gameFieldController($scope, $routeParams) {
+	        _classCallCheck(this, gameFieldController);
+	
+	        console.log($routeParams.size);
+	
+	        this.size = $routeParams.size || 3;
+	        this.gridLoaded = false;
+	
+	        this.initGrid($scope);
+	
+	        this.playerMove = true;
+	
+	        this.gameStatus = 'WIN';
+	        this.gameEnded = false;
+	    }
+	
+	    _createClass(gameFieldController, [{
+	        key: 'initGrid',
+	        value: function initGrid($scope) {
+	            var _this = this;
+	
+	            var _self = this;
+	            return new Promise(function (resolve, reject) {
+	                resolve(new _Grid2.default(_this.size));
+	                reject();
+	            }).then(function (grid) {
+	                console.log(grid);
+	                _self.grid = grid;
+	                _self.gridLoaded = true;
+	                $scope.$apply();
+	            }).catch(function (err) {
+	                console.log(err);
+	            });
+	        }
+	    }, {
+	        key: 'makeMove',
+	        value: function makeMove(pos) {
+	            var sign = this.playerMove ? PLAYER_SIGN : ENEMY_SIGN;
+	
+	            this.grid.cells[pos.y][pos.x] = sign;
+	        }
+	    }]);
+	
+	    return gameFieldController;
+	}();
 	
 	exports.default = gameFieldController;
 
@@ -32360,8 +32419,8 @@
 	    templateUrl: 'templates/fieldCell.template.html',
 	    controller: ['$scope', _fieldCell2.default],
 	    bindings: {
-	        x: '=',
-	        y: '='
+	        x: '<',
+	        y: '<'
 	    }
 	};
 	

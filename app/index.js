@@ -12,8 +12,7 @@ angular
     .module('ticTacToe', [
         'ngRoute',
         'start',
-        'field',
-        'cell'
+        'field'
     ])
     .controller('gameController', gameController);
 
@@ -38,7 +37,7 @@ angular
     .component('gameNew', gameNewComponent);
 
 angular
-    .module('field', [])
+    .module('field', ['cell'])
     .component('gameField', gameFieldComponent);
 
 angular

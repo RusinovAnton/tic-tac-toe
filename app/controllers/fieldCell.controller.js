@@ -1,6 +1,5 @@
 export default class fieldCellController {
     constructor($scope) {
-
     }
 
     handleCellClick(pos) {
