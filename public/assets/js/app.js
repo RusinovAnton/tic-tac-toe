@@ -32231,29 +32231,15 @@
 	    value: true
 	});
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
 	var _angular = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var gameNewController = function () {
-	    function gameNewController($scope, $routeParams) {
-	        _classCallCheck(this, gameNewController);
+	var gameNewController = function gameNewController($scope, $routeParams) {
+	    _classCallCheck(this, gameNewController);
 	
-	        this.size = parseInt($routeParams.size) || 3;
-	    }
-	
-	    _createClass(gameNewController, [{
-	        key: 'isValid',
-	        value: function isValid() {
-	            var size = this.size;
-	            return (0, _angular.isNumber)(size) && (size < 3 || size > 100);
-	        }
-	    }]);
-	
-	    return gameNewController;
-	}();
+	    this.size = parseInt($routeParams.size) || 3;
+	};
 	
 	exports.default = gameNewController;
 
@@ -32300,7 +32286,8 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var PLAYER_SIGN = '';
+	var PLAYER_SIGN = 'x';
+	var ENEMY_SIGN = 'y';
 	
 	var gameFieldController = function () {
 	    function gameFieldController($scope, $routeParams) {
@@ -32320,6 +32307,13 @@
 	    }
 	
 	    _createClass(gameFieldController, [{
+	        key: 'handleMove',
+	        value: function handleMove(pos) {
+	            var sign = this.playerMove ? PLAYER_SIGN : ENEMY_SIGN;
+	
+	            this.grid.cells[pos.y][pos.x] = sign;
+	        }
+	    }, {
 	        key: 'initGrid',
 	        value: function initGrid($scope) {
 	            var _this = this;
@@ -32336,13 +32330,6 @@
 	            }).catch(function (err) {
 	                console.log(err);
 	            });
-	        }
-	    }, {
-	        key: 'makeMove',
-	        value: function makeMove(pos) {
-	            var sign = this.playerMove ? PLAYER_SIGN : ENEMY_SIGN;
-	
-	            this.grid.cells[pos.y][pos.x] = sign;
 	        }
 	    }]);
 	
@@ -32420,7 +32407,9 @@
 	    controller: ['$scope', _fieldCell2.default],
 	    bindings: {
 	        x: '<',
-	        y: '<'
+	        y: '<',
+	        body: '<',
+	        onMove: '&'
 	    }
 	};
 	
@@ -32436,24 +32425,11 @@
 	    value: true
 	});
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var fieldCellController = function () {
-	    function fieldCellController($scope) {
-	        _classCallCheck(this, fieldCellController);
-	    }
-	
-	    _createClass(fieldCellController, [{
-	        key: "handleCellClick",
-	        value: function handleCellClick(pos) {
-	            console.log(pos);
-	        }
-	    }]);
-	
-	    return fieldCellController;
-	}();
+	var fieldCellController = function fieldCellController($scope) {
+	    _classCallCheck(this, fieldCellController);
+	};
 	
 	exports.default = fieldCellController;
 

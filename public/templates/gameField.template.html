@@ -4,7 +4,7 @@
     </span>
     <div class="game-field" ng-model="$ctrl.grid">
         <div class="row" ng-repeat="row in $ctrl.grid.cells">
-            <field-cell ng-repeat="item in row track by $index" x="$index" y="$parent.$index"></field-cell>
+            <field-cell ng-repeat="item in row track by $index" body="item" x="$index" y="$parent.$index" on-move="$ctrl.handleMove(pos)"></field-cell>
         </div>
     </div>
     <div ng-if='$ctrl.gameEnded' class="game-end">

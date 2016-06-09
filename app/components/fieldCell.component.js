@@ -5,7 +5,9 @@ let fieldCellComponent = {
     controller: ['$scope', fieldCellController],
     bindings: {
         x: '<',
-        y: '<'
+        y: '<',
+        body: '<',
+        onMove: '&'
     }
 };
 
