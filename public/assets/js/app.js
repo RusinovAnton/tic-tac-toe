@@ -32297,8 +32297,8 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var PLAYER_SIGN = 'x';
-	var ENEMY_SIGN = '0';
+	var PLAYER_SIGN = '<i class="fa fa-circle"></i>';
+	var ENEMY_SIGN = '<i class="fa fa-times"></i>';
 	
 	var gameFieldController = function () {
 	    function gameFieldController($scope, $routeParams) {
@@ -32317,7 +32317,6 @@
 	        };
 	
 	        this.playerMove = true;
-	
 	        this.gameStatus = 'WIN';
 	        this.gameEnded = false;
 	
@@ -32473,15 +32472,23 @@
 
 /***/ },
 /* 13 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _fieldCell = __webpack_require__(14);
+	
+	var _fieldCell2 = _interopRequireDefault(_fieldCell);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	var fieldCellComponent = {
 	    templateUrl: 'templates/fieldCell.template.html',
+	    controller: ['$scope', '$element', _fieldCell2.default],
 	    bindings: {
 	        x: '<',
 	        y: '<',
@@ -32491,6 +32498,21 @@
 	};
 	
 	exports.default = fieldCellComponent;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = fieldCellController;
+	function fieldCellController($scope, $element) {
+	    if (this.body) this.sign = angular.element($element).append(this.body);
+	    console.log(this.sign);
+	}
 
 /***/ }
 /******/ ]);

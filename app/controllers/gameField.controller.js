@@ -1,8 +1,8 @@
 import Grid from '../Grid';
 import GameStorage from '../storage/game.storage';
 
-let PLAYER_SIGN = 'x';
-let ENEMY_SIGN = '0';
+let PLAYER_SIGN = '<i class="fa fa-circle"></i>';
+let ENEMY_SIGN = '<i class="fa fa-times"></i>';
 
 export default class gameFieldController {
     constructor($scope, $routeParams) {
@@ -20,11 +20,8 @@ export default class gameFieldController {
         };
 
         this.playerMove = true;
-
         this.gameStatus = 'WIN';
         this.gameEnded = false;
-
-
 
         console.log(this);
     }

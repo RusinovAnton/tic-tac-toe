@@ -10,7 +10,13 @@
         <div class="col">
             <div class="game-field m-b" ng-model="$ctrl.grid">
                 <div class="row" ng-repeat="row in $ctrl.grid.cells">
-                    <field-cell ng-repeat="item in row track by $index" body="item" x="$index" y="$parent.$index" on-move="$ctrl.handleMove(pos)"></field-cell>
+                    <field-cell
+                        ng-repeat="item in row track by $index"
+                        body="item"
+                        x="$index"
+                        y="$parent.$index"
+                        on-move="$ctrl.handleMove(pos)">
+                    </field-cell>
                 </div>
             </div>
         </div>
