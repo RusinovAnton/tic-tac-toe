@@ -32311,6 +32311,10 @@
 	        };
 	
 	        this.store = new _game2.default();
+	        this.state = this.store.state || null;
+	        // Clear state if its size value is different from routeParams.size
+	        // (suppose it was changed via new game form or manually from url)
+	        if (this.state !== null && this.state.size !== this.size) this.store.clearState();
 	
 	        this.gridLoaded = false;
 	
@@ -32320,8 +32324,10 @@
 	    _createClass(gameFieldController, [{
 	        key: 'initGrid',
 	        value: function initGrid(size) {
+	            var _this = this;
+	
 	            return new Promise(function (resolve, reject) {
-	                resolve(new _Grid2.default(size));
+	                resolve(new _Grid2.default(size, _this.store.state));
 	                reject();
 	            });
 	        }
@@ -32350,7 +32356,7 @@
 	    }, {
 	        key: 'computerMove',
 	        value: function computerMove() {
-	            var _this = this;
+	            var _this2 = this;
 	
 	            // Do nothing if game ended
 	            if (this.gameEnded) return;
@@ -32358,13 +32364,14 @@
 	            var avaiableCell = this.grid.getAvaiableCells()[0];
 	
 	            setTimeout(function () {
-	                _this.$scope.$apply(function () {
-	                    _this.grid.cells[avaiableCell.y][avaiableCell.x] = new _Sign.EnemySign();
+	                _this2.$scope.$apply(function () {
+	                    _this2.grid.cells[avaiableCell.y][avaiableCell.x] = new _Sign.EnemySign();
 	                });
-	                _this.saveState();
-	                if (_this.isGameEnded()) return;
-	
-	                _this.playerMove = !_this.playerMove;
+	                _this2.saveState();
+	                _this2.$scope.$apply(function () {
+	                    _this2.isGameEnded();
+	                });
+	                _this2.playerMove = !_this2.playerMove;
 	            }, 500);
 	        }
 	    }, {
@@ -32402,7 +32409,7 @@
 	        value: function saveState() {
 	            this.store.state = {
 	                size: this.grid.size,
-	                grid: this.grid.cells
+	                cells: this.grid.cells
 	            };
 	        }
 	    }, {
@@ -32434,16 +32441,15 @@
 	    }, {
 	        key: 'newGame',
 	        value: function newGame() {
-	            var _this2 = this;
+	            var _this3 = this;
 	
 	            this.playerMove = true;
 	            this.gameStatus = '';
 	            this.gameEnded = false;
 	            this.initGrid(this.size).then(function (grid) {
-	                console.log(_this2);
-	                _this2.grid = grid;
-	                _this2.gridLoaded = true;
-	                _this2.$scope.$apply();
+	                _this3.grid = grid;
+	                _this3.gridLoaded = true;
+	                _this3.$scope.$apply();
 	            });
 	        }
 	    }]);
@@ -32475,8 +32481,7 @@
 	
 	        this.size = size;
 	        this.cells = [];
-	
-	        if (prevState === void 0) {
+	        if (prevState === null) {
 	            this.empty();
 	        } else {
 	            this.fromState(prevState);
@@ -32497,7 +32502,16 @@
 	        }
 	    }, {
 	        key: 'fromState',
-	        value: function fromState(state) {}
+	        value: function fromState(state) {
+	            var i, j;
+	            for (i = 0; i < state.size; i++) {
+	                this.cells[i] = [];
+	                for (j = 0; j < state.size; j++) {
+	                    // Empty cell
+	                    this.cells[i][j] = state.cells[i][j];
+	                }
+	            }
+	        }
 	
 	        /**
 	         *   Returns array of objects with coordinates of avaiable cells

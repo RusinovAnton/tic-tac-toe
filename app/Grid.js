@@ -7,11 +7,10 @@ class Grid {
     constructor(size, prevState) {
         this.size = size
         this.cells = []
-
-        if (prevState === void 0) {
+        if (prevState === null) {
             this.empty();
         } else {
-            this.fromState(prevState)
+            this.fromState(prevState);
         }
     }
 
@@ -27,6 +26,14 @@ class Grid {
     }
 
     fromState(state) {
+        var i, j;
+        for (i = 0; i < state.size; i++) {
+            this.cells[i] = [];
+            for (j = 0; j < state.size; j++) {
+                // Empty cell
+                this.cells[i][j] = state.cells[i][j];
+            }
+        }
     }
 
     /**

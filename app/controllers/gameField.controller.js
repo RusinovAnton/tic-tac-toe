@@ -15,6 +15,10 @@ export default class gameFieldController {
         }
 
         this.store = new GameStorage();
+        this.state = this.store.state || null;
+        // Clear state if its size value is different from routeParams.size
+        // (suppose it was changed via new game form or manually from url)
+        if (this.state !== null && this.state.size !== this.size) this.store.clearState();
 
         this.gridLoaded = false;
 
@@ -23,7 +27,7 @@ export default class gameFieldController {
 
     initGrid(size) {
         return new Promise((resolve, reject) => {
-                resolve(new Grid(size));
+                resolve(new Grid(size, this.store.state));
                 reject();
             });
     }
@@ -62,8 +66,9 @@ export default class gameFieldController {
                 this.grid.cells[avaiableCell.y][avaiableCell.x] = new EnemySign();
             });
             this.saveState();
-            if (this.isGameEnded()) return;
-
+            this.$scope.$apply(()=>{
+                this.isGameEnded()
+            })
             this.playerMove = !this.playerMove;
         }, 500);
 
@@ -99,7 +104,7 @@ export default class gameFieldController {
     saveState() {
         this.store.state = {
             size: this.grid.size,
-            grid: this.grid.cells
+            cells: this.grid.cells
         }
     }
 
@@ -132,7 +137,6 @@ export default class gameFieldController {
         this.gameEnded = false;
         this.initGrid(this.size)
             .then((grid)=>{
-                console.log(this);
                 this.grid = grid;
                 this.gridLoaded = true;
                 this.$scope.$apply();
