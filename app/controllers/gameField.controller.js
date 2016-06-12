@@ -7,6 +7,7 @@ export default class gameFieldController {
     constructor($scope, $routeParams) {
 
         this.$scope = $scope;
+
         this.size = $routeParams.size > 2 && $routeParams.size < 101 ? parseInt($routeParams.size) : 3;
 
         this.signs = {
@@ -15,25 +16,35 @@ export default class gameFieldController {
         }
 
         this.store = new GameStorage();
-        this.state = this.store.state || null;
-        // Clear state if its size value is different from routeParams.size
-        // (suppose it was changed via new game form or manually from url)
-        if (this.state !== null && this.state.size !== this.size) this.store.clearState();
+        if (this.store.state) {
+            this.playerMove = this.store.state.playerMove || true;
+            this.moves = this.store.state.moves || [];
+        } else {
+            this.playerMove = true;
+            this.moves = [];
+        }
 
-        this.gridLoaded = false;
 
         this.newGame();
     }
 
-    initGrid(size) {
+    initGrid() {
         return new Promise((resolve, reject) => {
-                resolve(new Grid(size, this.store.state));
+                resolve(new Grid(this.size, this.store.state));
                 reject();
             });
     }
 
+    storeMove(pos) {
+        if (this.moves.length >= 2) {
+            this.moves.shift();
+        }
+        this.moves.push(pos);
+    }
+
     handleMove(pos) {
 
+        this.storeMove(pos);
         // Do nothing if game ended
         if (this.gameEnded) return;
 
@@ -54,29 +65,49 @@ export default class gameFieldController {
 
     }
 
+    predictUserMove() {
+        let vector;
+
+        function checkVector(vector){
+            return (vector.x >= -1 && vector.x <= 1) && (vector.y >= -1 && vector.y <= 1)
+        }
+
+        if (this.moves.length >= 2) {
+            vector = {
+                x: this.moves[1].x - this.moves[0].x,
+                y: this.moves[1].y - this.moves[0].y
+            }
+            if (checkVector(vector)) {
+                return {x: this.moves[1].x + vector.x, y: this.moves[1].y + vector.y}
+            }
+        }
+
+        return false;
+    }
+
     computerMove() {
 
         // Do nothing if game ended
         if (this.gameEnded) return;
 
-        this.playerMove = !this.playerMove;
         var avaiableCell = this.grid.getAvaiableCells()[0];
 
-        setTimeout(()=>{
-            this.$scope.$apply(()=>{
-                this.grid.cells[avaiableCell.y][avaiableCell.x] = new EnemySign();
-            });
-            this.saveState();
-            this.$scope.$apply(()=>{
-                this.isGameEnded()
-            })
+        let nextMove = this.predictUserMove() || {x: avaiableCell.x, y: avaiableCell.y};
 
+        setTimeout(()=>{
+            this.$scope.$apply(()=> {
+                this.grid.cells[nextMove.y][nextMove.x] = new EnemySign();
+                this.saveState();
+                this.isGameEnded();
+                this.playerMove = !this.playerMove;
+            });
         }, 500);
 
     }
 
     isGameEnded() {
 
+        // Draw when there is no way to win
         if (!this.grid.possibleWin()) {
             this.gameDraw();
             return true;
@@ -88,8 +119,6 @@ export default class gameFieldController {
             this.gameEnd(isDone);
             return true;
         }
-
-        //let turn = this.playerMove ? 'player' : 'enemy';
 
         // Draw if there is no more avaiable cells
         if (!this.grid.cellsAvaiable()) {
@@ -106,12 +135,15 @@ export default class gameFieldController {
     saveState() {
         this.store.state = {
             size: this.grid.size,
-            cells: this.grid.cells
+            cells: this.grid.cells,
+            moves: this.moves,
+            playerMove: this.playerMove
         }
     }
 
     gameEnd(isDoneObj) {
         this.store.clearState();
+        // TODO: find out why it doesnt update view
         isDoneObj.lane.forEach((cell)=>{
             cell.highlighed = true;
         });
@@ -122,7 +154,6 @@ export default class gameFieldController {
         } else {
             this.gameStatus = 'You lose :(';
         }
-
     }
 
     gameDraw() {
@@ -135,18 +166,22 @@ export default class gameFieldController {
         this.store.clearState();
         this.grid = null;
         this.gridLoaded = false;
+        this.moves = [];
+        this.playerMove = true;
         this.newGame();
     }
 
     newGame() {
-        this.playerMove = true;
         this.gameStatus = '';
         this.gameEnded = false;
-        this.initGrid(this.size)
+        this.initGrid()
             .then((grid)=>{
                 this.grid = grid;
                 this.gridLoaded = true;
                 this.$scope.$apply();
             });
+        if (!this.playerMove) {
+            this.computerMove();
+        }
     }
 }

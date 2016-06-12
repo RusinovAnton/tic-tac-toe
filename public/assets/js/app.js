@@ -32303,6 +32303,7 @@
 	        _classCallCheck(this, gameFieldController);
 	
 	        this.$scope = $scope;
+	
 	        this.size = $routeParams.size > 2 && $routeParams.size < 101 ? parseInt($routeParams.size) : 3;
 	
 	        this.signs = {
@@ -32311,30 +32312,40 @@
 	        };
 	
 	        this.store = new _game2.default();
-	        this.state = this.store.state || null;
-	        // Clear state if its size value is different from routeParams.size
-	        // (suppose it was changed via new game form or manually from url)
-	        if (this.state !== null && this.state.size !== this.size) this.store.clearState();
-	
-	        this.gridLoaded = false;
+	        if (this.store.state) {
+	            this.playerMove = this.store.state.playerMove || true;
+	            this.moves = this.store.state.moves || [];
+	        } else {
+	            this.playerMove = true;
+	            this.moves = [];
+	        }
 	
 	        this.newGame();
 	    }
 	
 	    _createClass(gameFieldController, [{
 	        key: 'initGrid',
-	        value: function initGrid(size) {
+	        value: function initGrid() {
 	            var _this = this;
 	
 	            return new Promise(function (resolve, reject) {
-	                resolve(new _Grid2.default(size, _this.store.state));
+	                resolve(new _Grid2.default(_this.size, _this.store.state));
 	                reject();
 	            });
+	        }
+	    }, {
+	        key: 'storeMove',
+	        value: function storeMove(pos) {
+	            if (this.moves.length >= 2) {
+	                this.moves.shift();
+	            }
+	            this.moves.push(pos);
 	        }
 	    }, {
 	        key: 'handleMove',
 	        value: function handleMove(pos) {
 	
+	            this.storeMove(pos);
 	            // Do nothing if game ended
 	            if (this.gameEnded) return;
 	
@@ -32354,6 +32365,27 @@
 	            this.computerMove();
 	        }
 	    }, {
+	        key: 'predictUserMove',
+	        value: function predictUserMove() {
+	            var vector = void 0;
+	
+	            function checkVector(vector) {
+	                return vector.x >= -1 && vector.x <= 1 && vector.y >= -1 && vector.y <= 1;
+	            }
+	
+	            if (this.moves.length >= 2) {
+	                vector = {
+	                    x: this.moves[1].x - this.moves[0].x,
+	                    y: this.moves[1].y - this.moves[0].y
+	                };
+	                if (checkVector(vector)) {
+	                    return { x: this.moves[1].x + vector.x, y: this.moves[1].y + vector.y };
+	                }
+	            }
+	
+	            return false;
+	        }
+	    }, {
 	        key: 'computerMove',
 	        value: function computerMove() {
 	            var _this2 = this;
@@ -32361,16 +32393,16 @@
 	            // Do nothing if game ended
 	            if (this.gameEnded) return;
 	
-	            this.playerMove = !this.playerMove;
 	            var avaiableCell = this.grid.getAvaiableCells()[0];
+	
+	            var nextMove = this.predictUserMove() || { x: avaiableCell.x, y: avaiableCell.y };
 	
 	            setTimeout(function () {
 	                _this2.$scope.$apply(function () {
-	                    _this2.grid.cells[avaiableCell.y][avaiableCell.x] = new _Sign.EnemySign();
-	                });
-	                _this2.saveState();
-	                _this2.$scope.$apply(function () {
+	                    _this2.grid.cells[nextMove.y][nextMove.x] = new _Sign.EnemySign();
+	                    _this2.saveState();
 	                    _this2.isGameEnded();
+	                    _this2.playerMove = !_this2.playerMove;
 	                });
 	            }, 500);
 	        }
@@ -32378,6 +32410,7 @@
 	        key: 'isGameEnded',
 	        value: function isGameEnded() {
 	
+	            // Draw when there is no way to win
 	            if (!this.grid.possibleWin()) {
 	                this.gameDraw();
 	                return true;
@@ -32389,8 +32422,6 @@
 	                this.gameEnd(isDone);
 	                return true;
 	            }
-	
-	            //let turn = this.playerMove ? 'player' : 'enemy';
 	
 	            // Draw if there is no more avaiable cells
 	            if (!this.grid.cellsAvaiable()) {
@@ -32410,13 +32441,16 @@
 	        value: function saveState() {
 	            this.store.state = {
 	                size: this.grid.size,
-	                cells: this.grid.cells
+	                cells: this.grid.cells,
+	                moves: this.moves,
+	                playerMove: this.playerMove
 	            };
 	        }
 	    }, {
 	        key: 'gameEnd',
 	        value: function gameEnd(isDoneObj) {
 	            this.store.clearState();
+	            // TODO: find out why it doesnt update view
 	            isDoneObj.lane.forEach(function (cell) {
 	                cell.highlighed = true;
 	            });
@@ -32441,6 +32475,8 @@
 	            this.store.clearState();
 	            this.grid = null;
 	            this.gridLoaded = false;
+	            this.moves = [];
+	            this.playerMove = true;
 	            this.newGame();
 	        }
 	    }, {
@@ -32448,14 +32484,16 @@
 	        value: function newGame() {
 	            var _this3 = this;
 	
-	            this.playerMove = true;
 	            this.gameStatus = '';
 	            this.gameEnded = false;
-	            this.initGrid(this.size).then(function (grid) {
+	            this.initGrid().then(function (grid) {
 	                _this3.grid = grid;
 	                _this3.gridLoaded = true;
 	                _this3.$scope.$apply();
 	            });
+	            if (!this.playerMove) {
+	                this.computerMove();
+	            }
 	        }
 	    }]);
 	
@@ -32489,6 +32527,7 @@
 	            this.size = size;
 	            this.empty();
 	        } else {
+	            this.size = prevState.size;
 	            this.fromState(prevState);
 	        }
 	    }
@@ -32512,7 +32551,7 @@
 	            for (i = 0; i < state.size; i++) {
 	                this.cells[i] = [];
 	                for (j = 0; j < state.size; j++) {
-	                    this.cells[i][j] = state.cells[i][j];
+	                    this.cells[i][j] = (0, _lodash.cloneDeep)(state.cells[i][j]);
 	                }
 	            }
 	        }
