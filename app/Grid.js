@@ -1,6 +1,6 @@
 'use strict';
 
-import {every, some} from 'lodash';
+import {every, some, cloneDeep} from 'lodash';
 
 class Grid {
 
@@ -10,6 +10,7 @@ class Grid {
             this.size = size
             this.empty();
         } else {
+            this.size = prevState.size;
             this.fromState(prevState);
         }
     }
@@ -30,7 +31,7 @@ class Grid {
         for (i = 0; i < state.size; i++) {
             this.cells[i] = [];
             for (j = 0; j < state.size; j++) {
-                this.cells[i][j] = state.cells[i][j];
+                this.cells[i][j] = cloneDeep(state.cells[i][j]);
             }
         }
     }
