@@ -8,6 +8,8 @@
     }
 }
 
+
+
 /* temp */
 .fa-times:before {
     content:'x';
@@ -21,6 +23,13 @@
     background: #ccc!important;
     color: #eee!important;
     pointer-events: none!important;
+}
+
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 :focus {
