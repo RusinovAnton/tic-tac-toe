@@ -5,9 +5,9 @@ import {every, some} from 'lodash';
 class Grid {
 
     constructor(size, prevState) {
-        this.size = size
         this.cells = []
         if (prevState === null) {
+            this.size = size
             this.empty();
         } else {
             this.fromState(prevState);
@@ -30,7 +30,6 @@ class Grid {
         for (i = 0; i < state.size; i++) {
             this.cells[i] = [];
             for (j = 0; j < state.size; j++) {
-                // Empty cell
                 this.cells[i][j] = state.cells[i][j];
             }
         }
@@ -153,14 +152,25 @@ class Grid {
     }
 
     /**
+     * Checks if there are lanes with all players' or all enemy's signs in it
      * Returns true if there are a winning line
      *
      * @returns {bool}
      */
     isDone() {
         return this.checkLanes((lane) => {
-            // Checks if there are lanes with all players' or all enemy's signs in it
-            return every(lane, {who: 'player'}) || every(lane, {who: 'enemy'});
+            if (every(lane, {who: 'player'})) {
+                return {
+                    who: 'player',
+                    lane
+                }
+            } else if (every(lane, {who: 'enemy'})) {
+                return {
+                    who: 'enemy',
+                    lane
+                }
+            }
+            return false;
         });
     }
 

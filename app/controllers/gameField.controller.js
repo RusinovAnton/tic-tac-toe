@@ -59,6 +59,7 @@ export default class gameFieldController {
         // Do nothing if game ended
         if (this.gameEnded) return;
 
+        this.playerMove = !this.playerMove;
         var avaiableCell = this.grid.getAvaiableCells()[0];
 
         setTimeout(()=>{
@@ -69,7 +70,7 @@ export default class gameFieldController {
             this.$scope.$apply(()=>{
                 this.isGameEnded()
             })
-            this.playerMove = !this.playerMove;
+
         }, 500);
 
     }
@@ -82,8 +83,9 @@ export default class gameFieldController {
         }
 
         // End game if there is winning lane
-        if (this.grid.isDone()) {
-            this.gameEnd('player');
+        let isDone = this.grid.isDone();
+        if (isDone) {
+            this.gameEnd(isDone);
             return true;
         }
 
@@ -108,14 +110,19 @@ export default class gameFieldController {
         }
     }
 
-    gameEnd(winner, winLane) {
+    gameEnd(isDoneObj) {
         this.store.clearState();
+        isDoneObj.lane.forEach((cell)=>{
+            cell.highlighed = true;
+        });
+        this.grid = this.grid;
         this.gameEnded = true;
-        if (winner === 'player') {
+        if (isDoneObj.who === 'player') {
             this.gameStatus = 'You win! Yay';
         } else {
             this.gameStatus = 'You lose :(';
         }
+
     }
 
     gameDraw() {

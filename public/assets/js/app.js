@@ -32361,6 +32361,7 @@
 	            // Do nothing if game ended
 	            if (this.gameEnded) return;
 	
+	            this.playerMove = !this.playerMove;
 	            var avaiableCell = this.grid.getAvaiableCells()[0];
 	
 	            setTimeout(function () {
@@ -32371,7 +32372,6 @@
 	                _this2.$scope.$apply(function () {
 	                    _this2.isGameEnded();
 	                });
-	                _this2.playerMove = !_this2.playerMove;
 	            }, 500);
 	        }
 	    }, {
@@ -32384,8 +32384,9 @@
 	            }
 	
 	            // End game if there is winning lane
-	            if (this.grid.isDone()) {
-	                this.gameEnd('player');
+	            var isDone = this.grid.isDone();
+	            if (isDone) {
+	                this.gameEnd(isDone);
 	                return true;
 	            }
 	
@@ -32414,10 +32415,14 @@
 	        }
 	    }, {
 	        key: 'gameEnd',
-	        value: function gameEnd(winner, winLane) {
+	        value: function gameEnd(isDoneObj) {
 	            this.store.clearState();
+	            isDoneObj.lane.forEach(function (cell) {
+	                cell.highlighed = true;
+	            });
+	            this.grid = this.grid;
 	            this.gameEnded = true;
-	            if (winner === 'player') {
+	            if (isDoneObj.who === 'player') {
 	                this.gameStatus = 'You win! Yay';
 	            } else {
 	                this.gameStatus = 'You lose :(';
@@ -32479,9 +32484,9 @@
 	    function Grid(size, prevState) {
 	        _classCallCheck(this, Grid);
 	
-	        this.size = size;
 	        this.cells = [];
 	        if (prevState === null) {
+	            this.size = size;
 	            this.empty();
 	        } else {
 	            this.fromState(prevState);
@@ -32507,7 +32512,6 @@
 	            for (i = 0; i < state.size; i++) {
 	                this.cells[i] = [];
 	                for (j = 0; j < state.size; j++) {
-	                    // Empty cell
 	                    this.cells[i][j] = state.cells[i][j];
 	                }
 	            }
@@ -32658,6 +32662,7 @@
 	        }
 	
 	        /**
+	         * Checks if there are lanes with all players' or all enemy's signs in it
 	         * Returns true if there are a winning line
 	         *
 	         * @returns {bool}
@@ -32667,8 +32672,18 @@
 	        key: 'isDone',
 	        value: function isDone() {
 	            return this.checkLanes(function (lane) {
-	                // Checks if there are lanes with all players' or all enemy's signs in it
-	                return (0, _lodash.every)(lane, { who: 'player' }) || (0, _lodash.every)(lane, { who: 'enemy' });
+	                if ((0, _lodash.every)(lane, { who: 'player' })) {
+	                    return {
+	                        who: 'player',
+	                        lane: lane
+	                    };
+	                } else if ((0, _lodash.every)(lane, { who: 'enemy' })) {
+	                    return {
+	                        who: 'enemy',
+	                        lane: lane
+	                    };
+	                }
+	                return false;
 	            });
 	        }
 	
