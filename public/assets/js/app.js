@@ -73,7 +73,7 @@
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
-	var _fieldCell = __webpack_require__(16);
+	var _fieldCell = __webpack_require__(17);
 	
 	var _fieldCell2 = _interopRequireDefault(_fieldCell);
 	
@@ -32286,11 +32286,11 @@
 	
 	var _Grid2 = _interopRequireDefault(_Grid);
 	
-	var _randomInt = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../utils/randomInt\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var _randomInt = __webpack_require__(14);
 	
-	var _Sign = __webpack_require__(14);
+	var _Sign = __webpack_require__(15);
 	
-	var _game = __webpack_require__(15);
+	var _game = __webpack_require__(16);
 	
 	var _game2 = _interopRequireDefault(_game);
 	
@@ -32349,7 +32349,24 @@
 	        }
 	    }, {
 	        key: 'computerMove',
-	        value: function computerMove() {}
+	        value: function computerMove() {
+	            var _this = this;
+	
+	            // Do nothing if game ended
+	            if (this.gameEnded) return;
+	
+	            var avaiableCell = this.grid.getAvaiableCells()[0];
+	
+	            setTimeout(function () {
+	                _this.$scope.$apply(function () {
+	                    _this.grid.cells[avaiableCell.y][avaiableCell.x] = new _Sign.EnemySign();
+	                });
+	                _this.saveState();
+	                if (_this.isGameEnded()) return;
+	
+	                _this.playerMove = !_this.playerMove;
+	            }, 500);
+	        }
 	    }, {
 	        key: 'isGameEnded',
 	        value: function isGameEnded() {
@@ -32369,7 +32386,6 @@
 	
 	            // Draw if there is no more avaiable cells
 	            if (!this.grid.cellsAvaiable()) {
-	                console.log('draw');
 	                this.gameDraw();
 	                return true;
 	            }
@@ -32418,16 +32434,16 @@
 	    }, {
 	        key: 'newGame',
 	        value: function newGame() {
-	            var _this = this;
+	            var _this2 = this;
 	
 	            this.playerMove = true;
 	            this.gameStatus = '';
 	            this.gameEnded = false;
 	            this.initGrid(this.size).then(function (grid) {
-	                console.log(_this);
-	                _this.grid = grid;
-	                _this.gridLoaded = true;
-	                _this.$scope.$apply();
+	                console.log(_this2);
+	                _this2.grid = grid;
+	                _this2.gridLoaded = true;
+	                _this2.$scope.$apply();
 	            });
 	        }
 	    }]);
@@ -49095,6 +49111,20 @@
 /* 14 */
 /***/ function(module, exports) {
 
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = randomInt;
+	function randomInt(min, max) {
+	    return Math.floor(Math.random() * (max - min)) + min;
+	}
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
@@ -49143,7 +49173,7 @@
 	exports.EnemySign = EnemySign;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -49184,7 +49214,7 @@
 	exports.default = GameStorage;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';

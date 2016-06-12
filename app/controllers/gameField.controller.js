@@ -52,6 +52,21 @@ export default class gameFieldController {
 
     computerMove() {
 
+        // Do nothing if game ended
+        if (this.gameEnded) return;
+
+        var avaiableCell = this.grid.getAvaiableCells()[0];
+
+        setTimeout(()=>{
+            this.$scope.$apply(()=>{
+                this.grid.cells[avaiableCell.y][avaiableCell.x] = new EnemySign();
+            });
+            this.saveState();
+            if (this.isGameEnded()) return;
+
+            this.playerMove = !this.playerMove;
+        }, 500);
+
     }
 
     isGameEnded() {
@@ -71,7 +86,6 @@ export default class gameFieldController {
 
         // Draw if there is no more avaiable cells
         if (!this.grid.cellsAvaiable()) {
-            console.log('draw');
             this.gameDraw();
             return true;
         }
