@@ -32472,11 +32472,10 @@
 	        value: function fromState(state) {}
 	
 	        /**
-	        *   Returns Promise which resolves array of objects with coordinates of avaiable cells
-	        *   e.g
-	        *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
-	        * @returns {Promise}
-	        */
+	         *   Returns array of objects with coordinates of avaiable cells
+	         *   e.g
+	         *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
+	         */
 	
 	    }, {
 	        key: 'getAvaiableCells',
@@ -32493,9 +32492,10 @@
 	        }
 	
 	        /**
-	        * True if there is avaiable cells
-	        * @returns {boolean}
-	        */
+	         * True if there is avaiable cells
+	         *
+	         * @returns {boolean}
+	         */
 	
 	    }, {
 	        key: 'cellsAvaiable',
@@ -32507,6 +32507,7 @@
 	         * [x, ., .]
 	         * [., x, .]
 	         * [., ., x]
+	         *
 	         * @returns {Array} Array with elements from first diagonal
 	         */
 	
@@ -32526,6 +32527,7 @@
 	         * [., ., x]
 	         * [., x, .]
 	         * [x, ., .]
+	         *
 	         * @returns {Array} Array with elements from second diagonal
 	         */
 	
@@ -32542,11 +32544,25 @@
 	            }
 	            return diagonal;
 	        }
+	
+	        /**
+	         * Iterates throw all grids' rows and applies given callback
+	         *
+	         * @param {Function} cb - callback
+	         */
+	
 	    }, {
 	        key: 'forEachRow',
 	        value: function forEachRow(cb) {
 	            return this.cells.forEach(cb);
 	        }
+	
+	        /**
+	         * Iterates throw all grids' columns and applies given callback
+	         *
+	         * @param cb
+	         */
+	
 	    }, {
 	        key: 'forEachColumn',
 	        value: function forEachColumn(cb) {
@@ -32556,9 +32572,11 @@
 	
 	            var _loop = function _loop() {
 	                var col = [];
-	                _this.cells.forEach(function (row) {
+	                // Iterates throw each grids' row and compose column array
+	                _this.forEachRow(function (row) {
 	                    col.push(row[i]);
 	                });
+	                // Then pass column array to the given callback function
 	                cb(col);
 	            };
 	
@@ -32566,6 +32584,16 @@
 	                _loop();
 	            }
 	        }
+	
+	        /**
+	         * This method takes checker function (checkLane)
+	         * and goes throw all grids' lanes (which are arrays from diagonales, rows, columns)
+	         * and returns true if there are at least one match for checker
+	         *
+	         * @param checkLane
+	         * @returns {boolean}
+	         */
+	
 	    }, {
 	        key: 'checkLanes',
 	        value: function checkLanes(checkLane) {
@@ -32588,17 +32616,28 @@
 	        }
 	
 	        /**
-	        * Returns true if there are a winning line
-	        * @returns {bool}
-	        */
+	         * Returns true if there are a winning line
+	         *
+	         * @returns {bool}
+	         */
 	
 	    }, {
 	        key: 'isDone',
 	        value: function isDone() {
 	            return this.checkLanes(function (lane) {
+	                // Checks if there are lanes with all players' or all enemy's signs in it
 	                return (0, _lodash.every)(lane, { who: 'player' }) || (0, _lodash.every)(lane, { who: 'enemy' });
 	            });
 	        }
+	
+	        /**
+	         * Check if there are lanes which impossible to win because
+	         * there are both players' and enemys' signs on them
+	         * returns true if it is possible to win lane
+	         *
+	         * @returns {boolean}
+	         */
+	
 	    }, {
 	        key: 'possibleWin',
 	        value: function possibleWin(turn) {
