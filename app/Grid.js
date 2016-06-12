@@ -1,4 +1,6 @@
-import {every} from 'lodash';
+'use strict';
+
+import {every, some} from 'lodash';
 
 class Grid {
 
@@ -53,6 +55,55 @@ class Grid {
     }
 
     /**
+     * [x, ., .]
+     * [., x, .]
+     * [., ., x]
+     * @returns {Array} Array with elements from first diagonal
+     */
+    getFirstDiagonal() {
+        let diagonal = [];
+
+        let i = 0;
+        for (i; i < this.size; i++) {
+            diagonal.push(this.cells[i][i]);
+        }
+        return diagonal;
+    }
+
+    /**
+     * [., ., x]
+     * [., x, .]
+     * [x, ., .]
+     * @returns {Array} Array with elements from second diagonal
+     */
+    getSecondDiagonal() {
+        let diagonal = [];
+        let i = 0;
+        let j = this.size - 1;
+        while (i < this.size) {
+            diagonal.push(this.cells[i][j]);
+            i++;
+            j--;
+        }
+        return diagonal;
+    }
+
+    forEachRow(cb) {
+        return this.cells.forEach(cb);
+    }
+
+    forEachColumn(cb) {
+        let i = 0;
+        for (i;i<this.size;i++){
+            let col = [];
+            this.cells.forEach((row)=>{
+                col.push(row[i]);
+            });
+            cb(col);
+        }
+    }
+
+    /**
     * Returns true if there are a winning line
     * @returns {bool}
     */
@@ -64,82 +115,50 @@ class Grid {
         * @param array
         * @returns {bool}
         */
-        function checkLine(array){
+        function checkLane(array){
           return every(array, {who:'player'}) || every(array, {who: 'enemy'});
         }
 
         function isDiagonalDone() {
-
-          /**
-           * [x, ., .]
-           * [., x, .]
-           * [., ., x]
-           * @returns {Array} Array with elements from first diagonal
-           */
-          function getFirstDiagonal() {
-              let diagonal = [];
-
-              let i = 0;
-              for (i; i < _self.size; i++) {
-                  diagonal.push(_self.cells[i][i]);
-              }
-              return diagonal;
-          }
-
-          /**
-           * [., ., x]
-           * [., x, .]
-           * [x, ., .]
-           * @returns {Array} Array with elements from second diagonal
-           */
-          function getSecondDiagonal() {
-              let diagonal = [];
-              let i = 0;
-              let j = _self.size - 1;
-              while (i < _self.size) {
-                  diagonal.push(_self.cells[i][j]);
-                  i++;
-                  j--;
-              }
-              return diagonal;
-          }
-
-          return checkLine(getFirstDiagonal()) || checkLine(getSecondDiagonal());
-      }
+          return checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal());
+        }
 
         /**
-         * checks every horizontal for winning lane
+         * checks every row for winning lane
          * @returns {boolean} true if there are winning lane
          */
-        function isHorizontalDone() {
+        function isRowDone() {
           let isDone = false;
 
-          _self.cells.forEach((row)=>{
-              isDone = checkLine(row) || isDone;
-          });
+            this.forEachRow((row)=>{
+                isDone = checkLane(row) || isDone;
+            });
 
           return isDone;
-      }
+      }.bind(this)
 
         /**
-        * checks every vertical for winning lane
+        * checks every column for winning lane
         * @returns {boolean} true if there are winning lane
         */
-        function isVerticalDone() {
+        function isColumnDone() {
           let isDone = false;
-          let i = 0;
-          for (i;i<_self.size;i++){
-              let col = [];
-              _self.cells.forEach((row)=>{
-                  col.push(row[i]);
+
+          this.forEachColumn((col)=>{
+              isDone = checkLane(col) || isDone
           });
-              isDone = checkLine(col) || isDone;
-          }
 
           return isDone;
-      }
+      }.bind(this)
 
-        return isDiagonalDone() || isHorizontalDone() || isVerticalDone();
+        return isDiagonalDone() || isRowDone() || isColumnDone();
+    }
+
+    possibleWin(turn) {
+        let isPossible = true;
+
+
+        return isPossible;
     }
 }
 

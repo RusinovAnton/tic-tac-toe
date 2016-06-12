@@ -40,7 +40,8 @@ export default class gameFieldController {
             : new EnemySign();
 
         this.saveState();
-        this.isGameEnded();
+
+        if (this.isGameEnded()) return;
 
         // Change move turn
         this.playerMove = !this.playerMove;
@@ -51,20 +52,29 @@ export default class gameFieldController {
         // End game if there is winning lane
         if (this.grid.isDone()) {
             this.gameEnd('player');
-            return;
+            return true;
+        }
+
+        let turn = this.playerMove ? 'player' : 'enemy';
+
+        if (!this.grid.possibleWin(turn)) {
+            this.gameDraw();
+            return true;
         }
 
         // Draw if there is no more avaiable cells
         if (!this.grid.cellsAvaiable()) {
             console.log('draw');
             this.gameDraw();
-            return;
+            return true;
         }
+
+        return false;
     }
 
-      /**
-       * Save game's state into localstorage
-       */
+    /**
+     * Save game's state into localstorage
+     */
     saveState() {
         this.store.state = {
             size: this.grid.size,

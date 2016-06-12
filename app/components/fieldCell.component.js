@@ -4,7 +4,6 @@ let fieldCellComponent = {
         x: '<',
         y: '<',
         sign: '<',
-        highlighted: '<'
         onMove: '&'
     }
 };

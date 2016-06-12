@@ -32343,7 +32343,8 @@
 	            this.grid.cells[pos.y][pos.x] = this.playerMove ? new _Sign.PlayerSign() : new _Sign.EnemySign();
 	
 	            this.saveState();
-	            this.isGameEnded();
+	
+	            if (this.isGameEnded()) return;
 	
 	            // Change move turn
 	            this.playerMove = !this.playerMove;
@@ -32354,15 +32355,24 @@
 	            // End game if there is winning lane
 	            if (this.grid.isDone()) {
 	                this.gameEnd('player');
-	                return;
+	                return true;
+	            }
+	
+	            var turn = this.playerMove ? 'player' : 'enemy';
+	
+	            if (!this.grid.possibleWin(turn)) {
+	                this.gameDraw();
+	                return true;
 	            }
 	
 	            // Draw if there is no more avaiable cells
 	            if (!this.grid.cellsAvaiable()) {
 	                console.log('draw');
 	                this.gameDraw();
-	                return;
+	                return true;
 	            }
+	
+	            return false;
 	        }
 	
 	        /**
@@ -32502,6 +32512,70 @@
 	        }
 	
 	        /**
+	         * [x, ., .]
+	         * [., x, .]
+	         * [., ., x]
+	         * @returns {Array} Array with elements from first diagonal
+	         */
+	
+	    }, {
+	        key: 'getFirstDiagonal',
+	        value: function getFirstDiagonal() {
+	            var diagonal = [];
+	
+	            var i = 0;
+	            for (i; i < this.size; i++) {
+	                diagonal.push(this.cells[i][i]);
+	            }
+	            return diagonal;
+	        }
+	
+	        /**
+	         * [., ., x]
+	         * [., x, .]
+	         * [x, ., .]
+	         * @returns {Array} Array with elements from second diagonal
+	         */
+	
+	    }, {
+	        key: 'getSecondDiagonal',
+	        value: function getSecondDiagonal() {
+	            var diagonal = [];
+	            var i = 0;
+	            var j = this.size - 1;
+	            while (i < this.size) {
+	                diagonal.push(this.cells[i][j]);
+	                i++;
+	                j--;
+	            }
+	            return diagonal;
+	        }
+	    }, {
+	        key: 'forEachRow',
+	        value: function forEachRow(cb) {
+	            return this.cells.forEach(cb);
+	        }
+	    }, {
+	        key: 'forEachColumn',
+	        value: function forEachColumn(cb) {
+	            var _this = this;
+	
+	            var i = 0;
+	
+	            var _loop = function _loop() {
+	                var col = [];
+	                _this.cells.forEach(function (row) {
+	                    col.push(row[i]);
+	                });
+	                cb(col);
+	            };
+	
+	            for (i; i < this.size; i++) {
+	                _loop();
+	            }
+	        }
+	
+	        /**
 	        * Returns true if there are a winning line
 	        * @returns {bool}
 	        */
@@ -32516,87 +32590,50 @@
 	            * @param array
 	            * @returns {bool}
 	            */
-	            function checkLine(array) {
+	            function checkLane(array) {
 	                return (0, _lodash.every)(array, { who: 'player' }) || (0, _lodash.every)(array, { who: 'enemy' });
 	            }
 	
 	            function isDiagonalDone() {
-	
-	                /**
-	                 * [x, ., .]
-	                 * [., x, .]
-	                 * [., ., x]
-	                 * @returns {Array} Array with elements from first diagonal
-	                 */
-	                function getFirstDiagonal() {
-	                    var diagonal = [];
-	
-	                    var i = 0;
-	                    for (i; i < _self.size; i++) {
-	                        diagonal.push(_self.cells[i][i]);
-	                    }
-	                    return diagonal;
-	                }
-	
-	                /**
-	                 * [., ., x]
-	                 * [., x, .]
-	                 * [x, ., .]
-	                 * @returns {Array} Array with elements from second diagonal
-	                 */
-	                function getSecondDiagonal() {
-	                    var diagonal = [];
-	                    var i = 0;
-	                    var j = _self.size - 1;
-	                    while (i < _self.size) {
-	                        diagonal.push(_self.cells[i][j]);
-	                        i++;
-	                        j--;
-	                    }
-	                    return diagonal;
-	                }
-	
-	                return checkLine(getFirstDiagonal()) || checkLine(getSecondDiagonal());
+	                return checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal());
 	            }
 	
 	            /**
-	             * checks every horizontal for winning lane
+	             * checks every row for winning lane
 	             * @returns {boolean} true if there are winning lane
 	             */
-	            function isHorizontalDone() {
+	            function isRowDone() {
 	                var isDone = false;
 	
-	                _self.cells.forEach(function (row) {
-	                    isDone = checkLine(row) || isDone;
+	                _self.forEachRow(function (row) {
+	                    isDone = checkLane(row) || isDone;
 	                });
 	
 	                return isDone;
 	            }
 	
 	            /**
-	            * checks every vertical for winning lane
+	            * checks every column for winning lane
 	            * @returns {boolean} true if there are winning lane
 	            */
-	            function isVerticalDone() {
+	            function isColumnDone() {
 	                var isDone = false;
-	                var i = 0;
 	
-	                var _loop = function _loop() {
-	                    var col = [];
-	                    _self.cells.forEach(function (row) {
-	                        col.push(row[i]);
-	                    });
-	                    isDone = checkLine(col) || isDone;
-	                };
-	
-	                for (i; i < _self.size; i++) {
-	                    _loop();
-	                }
+	                _self.forEachColumn(function (col) {
+	                    isDone = checkLane(col) || isDone;
+	                });
 	
 	                return isDone;
 	            }
 	
-	            return isDiagonalDone() || isHorizontalDone() || isVerticalDone();
+	            return isDiagonalDone() || isRowDone() || isColumnDone();
+	        }
+	    }, {
+	        key: 'possibleWin',
+	        value: function possibleWin(turn) {
+	            var isPossible = true;
+	
+	            return isPossible;
 	        }
 	    }]);
 	
