@@ -49,18 +49,19 @@ export default class gameFieldController {
     }
 
     isGameEnded() {
+
+        if (!this.grid.possibleWin()) {
+            this.gameDraw();
+            return true;
+        }
+
         // End game if there is winning lane
         if (this.grid.isDone()) {
             this.gameEnd('player');
             return true;
         }
 
-        let turn = this.playerMove ? 'player' : 'enemy';
-
-        if (!this.grid.possibleWin(turn)) {
-            this.gameDraw();
-            return true;
-        }
+        //let turn = this.playerMove ? 'player' : 'enemy';
 
         // Draw if there is no more avaiable cells
         if (!this.grid.cellsAvaiable()) {

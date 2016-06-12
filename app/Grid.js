@@ -115,8 +115,8 @@ class Grid {
         * @param array
         * @returns {bool}
         */
-        function checkLane(array){
-          return every(array, {who:'player'}) || every(array, {who: 'enemy'});
+        function checkLane(lane){
+          return every(lane, {who:'player'}) || every(lane, {who: 'enemy'});
         }
 
         function isDiagonalDone() {
@@ -155,8 +155,26 @@ class Grid {
     }
 
     possibleWin(turn) {
-        let isPossible = true;
 
+        let _self = this;
+
+        let isPossible = false;
+
+        function checkLane(lane) {
+            return !(some(lane,{who:'player'}) && some(lane, {who:'enemy'}));
+        }
+
+        isPossible = checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal()) || isPossible;
+
+        this.forEachRow((row)=>{
+            isPossible = checkLane(row) || isPossible;
+        });
+
+        this.forEachColumn((col)=>{
+            isPossible = checkLane(col) || isPossible;
+        });
+
+        console.log(isPossible);
 
         return isPossible;
     }

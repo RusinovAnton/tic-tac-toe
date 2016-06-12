@@ -32343,18 +32343,19 @@
 	    }, {
 	        key: 'isGameEnded',
 	        value: function isGameEnded() {
+	
+	            if (!this.grid.possibleWin()) {
+	                this.gameDraw();
+	                return true;
+	            }
+	
 	            // End game if there is winning lane
 	            if (this.grid.isDone()) {
 	                this.gameEnd('player');
 	                return true;
 	            }
 	
-	            var turn = this.playerMove ? 'player' : 'enemy';
-	
-	            if (!this.grid.possibleWin(turn)) {
-	                this.gameDraw();
-	                return true;
-	            }
+	            //let turn = this.playerMove ? 'player' : 'enemy';
 	
 	            // Draw if there is no more avaiable cells
 	            if (!this.grid.cellsAvaiable()) {
@@ -32581,8 +32582,8 @@
 	            * @param array
 	            * @returns {bool}
 	            */
-	            function checkLane(array) {
-	                return (0, _lodash.every)(array, { who: 'player' }) || (0, _lodash.every)(array, { who: 'enemy' });
+	            function checkLane(lane) {
+	                return (0, _lodash.every)(lane, { who: 'player' }) || (0, _lodash.every)(lane, { who: 'enemy' });
 	            }
 	
 	            function isDiagonalDone() {
@@ -32622,7 +32623,26 @@
 	    }, {
 	        key: 'possibleWin',
 	        value: function possibleWin(turn) {
-	            var isPossible = true;
+	
+	            var _self = this;
+	
+	            var isPossible = false;
+	
+	            function checkLane(lane) {
+	                return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
+	            }
+	
+	            isPossible = checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal()) || isPossible;
+	
+	            this.forEachRow(function (row) {
+	                isPossible = checkLane(row) || isPossible;
+	            });
+	
+	            this.forEachColumn(function (col) {
+	                isPossible = checkLane(col) || isPossible;
+	            });
+	
+	            console.log(isPossible);
 	
 	            return isPossible;
 	        }
