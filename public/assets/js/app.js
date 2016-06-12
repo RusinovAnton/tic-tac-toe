@@ -81,16 +81,7 @@
 	
 	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field']);
 	
-	_angular2.default.module('ticTacToe').filter('debug', function () {
-	    return function (input) {
-	        if (input === '') return 'empty string';
-	        return input ? input : '' + input;
-	    };
-	}).filter('int', function () {
-	    return function (input) {
-	        return parseInt(input);
-	    };
-	}).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
+	_angular2.default.module('ticTacToe').config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
 	    $locationProvider.hashPrefix('!');
 	    $routeProvider.when('/new', {
 	        template: '<game-new></game-new>'
