@@ -12,7 +12,7 @@
                 <div class="row" ng-repeat="row in $ctrl.grid.cells">
                     <field-cell
                         ng-repeat="item in row track by $index"
-                        body="item"
+                        sign="item"
                         x="$index"
                         y="$parent.$index"
                         on-move="$ctrl.handleMove(pos)">

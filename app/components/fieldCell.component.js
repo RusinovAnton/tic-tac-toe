@@ -6,7 +6,7 @@ let fieldCellComponent = {
     bindings: {
         x: '<',
         y: '<',
-        body: '<',
+        sign: '<',
         onMove: '&'
     }
 };

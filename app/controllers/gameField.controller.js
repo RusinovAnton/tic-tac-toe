@@ -1,20 +1,9 @@
 import Grid from '../Grid';
+import { PlayerSign, EnemySign } from '../Sign';
 import GameStorage from '../storage/game.storage';
-
-//let PLAYER_SIGN = '<i class="fa fa-circle"></i>';
-//let ENEMY_SIGN = '<i class="fa fa-times"></i>';
-
-let PLAYER_SIGN = '0';
-let ENEMY_SIGN = 'x';
 
 export default class gameFieldController {
     constructor($scope, $routeParams) {
-
-        this.signs = {
-            player: PLAYER_SIGN,
-            enemy: ENEMY_SIGN
-        };
-
         this.playerMove = true;
 
         this.gridLoaded = false;
@@ -47,14 +36,8 @@ export default class gameFieldController {
         if (this.grid.cells[pos.y][pos.x] !== null) return;
 
         this.grid.cells[pos.y][pos.x] = this.playerMove ?
-            {
-                who: 'player',
-                sign: PLAYER_SIGN
-            }
-            : {
-                who: 'enemy',
-                sign: ENEMY_SIGN
-            };
+            new PlayerSign()
+            : new EnemySign();
 
         // End game if there is winning lane
         if (this.grid.isDone()){

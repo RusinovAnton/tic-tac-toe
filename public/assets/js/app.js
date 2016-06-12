@@ -73,7 +73,7 @@
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
-	var _fieldCell = __webpack_require__(15);
+	var _fieldCell = __webpack_require__(16);
 	
 	var _fieldCell2 = _interopRequireDefault(_fieldCell);
 	
@@ -32289,7 +32289,9 @@
 	
 	var _Grid2 = _interopRequireDefault(_Grid);
 	
-	var _game = __webpack_require__(14);
+	var _Sign = __webpack_require__(14);
+	
+	var _game = __webpack_require__(15);
 	
 	var _game2 = _interopRequireDefault(_game);
 	
@@ -32297,20 +32299,9 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	//let PLAYER_SIGN = '<i class="fa fa-circle"></i>';
-	//let ENEMY_SIGN = '<i class="fa fa-times"></i>';
-	
-	var PLAYER_SIGN = '0';
-	var ENEMY_SIGN = 'x';
-	
 	var gameFieldController = function () {
 	    function gameFieldController($scope, $routeParams) {
 	        _classCallCheck(this, gameFieldController);
-	
-	        this.signs = {
-	            player: PLAYER_SIGN,
-	            enemy: ENEMY_SIGN
-	        };
 	
 	        this.playerMove = true;
 	
@@ -32345,13 +32336,7 @@
 	            // Do nothing if choosen cell isn't empty already
 	            if (this.grid.cells[pos.y][pos.x] !== null) return;
 	
-	            this.grid.cells[pos.y][pos.x] = this.playerMove ? {
-	                who: 'player',
-	                sign: PLAYER_SIGN
-	            } : {
-	                who: 'enemy',
-	                sign: ENEMY_SIGN
-	            };
+	            this.grid.cells[pos.y][pos.x] = this.playerMove ? new _Sign.PlayerSign() : new _Sign.EnemySign();
 	
 	            // End game if there is winning lane
 	            if (this.grid.isDone()) {
@@ -49005,6 +48990,57 @@
 	    value: true
 	});
 	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Sign = function Sign(who, body) {
+	    _classCallCheck(this, Sign);
+	
+	    this.who = who;
+	    this.body = body;
+	};
+	
+	var PlayerSign = function (_Sign) {
+	    _inherits(PlayerSign, _Sign);
+	
+	    function PlayerSign(body) {
+	        _classCallCheck(this, PlayerSign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(PlayerSign).call(this, 'player', 0));
+	    }
+	
+	    return PlayerSign;
+	}(Sign);
+	
+	var EnemySign = function (_Sign2) {
+	    _inherits(EnemySign, _Sign2);
+	
+	    function EnemySign(body) {
+	        _classCallCheck(this, EnemySign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EnemySign).call(this, 'enemy', 1));
+	    }
+	
+	    return EnemySign;
+	}(Sign);
+	
+	exports.Sign = Sign;
+	exports.PlayerSign = PlayerSign;
+	exports.EnemySign = EnemySign;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -49037,7 +49073,7 @@
 	exports.default = GameStorage;
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49046,7 +49082,7 @@
 	    value: true
 	});
 	
-	var _fieldCell = __webpack_require__(16);
+	var _fieldCell = __webpack_require__(17);
 	
 	var _fieldCell2 = _interopRequireDefault(_fieldCell);
 	
@@ -49058,7 +49094,7 @@
 	    bindings: {
 	        x: '<',
 	        y: '<',
-	        body: '<',
+	        sign: '<',
 	        onMove: '&'
 	    }
 	};
@@ -49066,7 +49102,7 @@
 	exports.default = fieldCellComponent;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports) {
 
 	"use strict";
