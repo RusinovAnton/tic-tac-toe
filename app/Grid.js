@@ -103,80 +103,39 @@ class Grid {
         }
     }
 
+    checkLanes(checkLane) {
+        let isValid = false;
+
+        // Check diagonals
+        isValid = checkLane(this.getFirstDiagonal()) || checkLane(this.getSecondDiagonal()) || isValid;
+
+        // Check rows
+        this.forEachRow((row)=>{
+            isValid = checkLane(row) || isValid;
+        });
+
+        // Check columns
+        this.forEachColumn((col)=>{
+            isValid = checkLane(col) || isValid
+        });
+
+        return isValid;
+    }
+
     /**
     * Returns true if there are a winning line
     * @returns {bool}
     */
     isDone() {
-        let _self = this;
-
-        /**
-        * Take line array and returns true if all signs in line are the same
-        * @param array
-        * @returns {bool}
-        */
-        function checkLane(lane){
-          return every(lane, {who:'player'}) || every(lane, {who: 'enemy'});
-        }
-
-        function isDiagonalDone() {
-          return checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal());
-        }
-
-        /**
-         * checks every row for winning lane
-         * @returns {boolean} true if there are winning lane
-         */
-        function isRowDone() {
-          let isDone = false;
-
-            _self.forEachRow((row)=>{
-                isDone = checkLane(row) || isDone;
-            });
-
-          return isDone;
-      }
-
-        /**
-        * checks every column for winning lane
-        * @returns {boolean} true if there are winning lane
-        */
-        function isColumnDone() {
-          let isDone = false;
-
-          _self.forEachColumn((col)=>{
-              isDone = checkLane(col) || isDone
-          });
-
-          return isDone;
-      }
-
-        return isDiagonalDone() || isRowDone() || isColumnDone();
+        return this.checkLanes((lane) => {
+            return every(lane, {who:'player'}) || every(lane, {who: 'enemy'});
+        });
     }
 
     possibleWin(turn) {
-
-        let _self = this;
-
-        let isPossible = false;
-
-        function checkLane(lane) {
+        return this.checkLanes((lane) => {
             return !(some(lane,{who:'player'}) && some(lane, {who:'enemy'}));
-        }
-
-        isPossible = checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal()) || isPossible;
-
-        this.forEachRow((row)=>{
-            isPossible = checkLane(row) || isPossible;
         });
-
-        this.forEachColumn((col)=>{
-            isPossible = checkLane(col) || isPossible;
-        });
-
-        console.log(isPossible);
-
-        return isPossible;
     }
 }
 

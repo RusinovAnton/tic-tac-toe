@@ -32566,6 +32566,26 @@
 	                _loop();
 	            }
 	        }
+	    }, {
+	        key: 'checkLanes',
+	        value: function checkLanes(checkLane) {
+	            var isValid = false;
+	
+	            // Check diagonals
+	            isValid = checkLane(this.getFirstDiagonal()) || checkLane(this.getSecondDiagonal()) || isValid;
+	
+	            // Check rows
+	            this.forEachRow(function (row) {
+	                isValid = checkLane(row) || isValid;
+	            });
+	
+	            // Check columns
+	            this.forEachColumn(function (col) {
+	                isValid = checkLane(col) || isValid;
+	            });
+	
+	            return isValid;
+	        }
 	
 	        /**
 	        * Returns true if there are a winning line
@@ -32575,76 +32595,16 @@
 	    }, {
 	        key: 'isDone',
 	        value: function isDone() {
-	            var _self = this;
-	
-	            /**
-	            * Take line array and returns true if all signs in line are the same
-	            * @param array
-	            * @returns {bool}
-	            */
-	            function checkLane(lane) {
+	            return this.checkLanes(function (lane) {
 	                return (0, _lodash.every)(lane, { who: 'player' }) || (0, _lodash.every)(lane, { who: 'enemy' });
-	            }
-	
-	            function isDiagonalDone() {
-	                return checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal());
-	            }
-	
-	            /**
-	             * checks every row for winning lane
-	             * @returns {boolean} true if there are winning lane
-	             */
-	            function isRowDone() {
-	                var isDone = false;
-	
-	                _self.forEachRow(function (row) {
-	                    isDone = checkLane(row) || isDone;
-	                });
-	
-	                return isDone;
-	            }
-	
-	            /**
-	            * checks every column for winning lane
-	            * @returns {boolean} true if there are winning lane
-	            */
-	            function isColumnDone() {
-	                var isDone = false;
-	
-	                _self.forEachColumn(function (col) {
-	                    isDone = checkLane(col) || isDone;
-	                });
-	
-	                return isDone;
-	            }
-	
-	            return isDiagonalDone() || isRowDone() || isColumnDone();
+	            });
 	        }
 	    }, {
 	        key: 'possibleWin',
 	        value: function possibleWin(turn) {
-	
-	            var _self = this;
-	
-	            var isPossible = false;
-	
-	            function checkLane(lane) {
+	            return this.checkLanes(function (lane) {
 	                return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
-	            }
-	
-	            isPossible = checkLane(_self.getFirstDiagonal()) || checkLane(_self.getSecondDiagonal()) || isPossible;
-	
-	            this.forEachRow(function (row) {
-	                isPossible = checkLane(row) || isPossible;
 	            });
-	
-	            this.forEachColumn(function (col) {
-	                isPossible = checkLane(col) || isPossible;
-	            });
-	
-	            console.log(isPossible);
-	
-	            return isPossible;
 	        }
 	    }]);
 	
