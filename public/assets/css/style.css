@@ -15,7 +15,7 @@
     content:'x';
 }
 
-.fa-circle:before {
+.fa-circle-o:before {
     content:'0';
 }
 
@@ -81,6 +81,12 @@ main > .container {
     cursor: pointer;
     box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.4);
     overflow: hidden;
+}
+.field--cell .fa-times {
+    color: #f00;
+}
+.field--cell .fa-circle-o {
+    color: #38c119;
 }
 
 .field--cell.highlighted {
