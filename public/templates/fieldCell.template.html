@@ -1,3 +1,4 @@
 <div class="field--cell" ng-model="$ctrl.sign" ng-click="$ctrl.onMove({pos: {x: $ctrl.x, y: $ctrl.y}})">
-
+    <i class="fa fa-circle" ng-if="$ctrl.body.who == 'player'"></i>
+    <i class="fa fa-times" ng-if="$ctrl.body.who == 'enemy'"></i>
 </div>

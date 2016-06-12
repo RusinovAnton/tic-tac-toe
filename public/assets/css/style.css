@@ -8,6 +8,15 @@
     }
 }
 
+/* temp */
+.fa-times:before {
+    content:'x';
+}
+
+.fa-circle:before {
+    content:'0';
+}
+
 [disabled] {
     background: #ccc!important;
     color: #eee!important;
