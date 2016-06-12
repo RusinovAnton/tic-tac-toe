@@ -4,20 +4,20 @@ import GameStorage from '../storage/game.storage';
 
 export default class gameFieldController {
     constructor($scope, $routeParams) {
-        this.playerMove = true;
 
-        this.gridLoaded = false;
-        this.gameStatus = 'WIN';
-        this.gameEnded = false;
+        this.$scope = $scope;
+        this.size = $routeParams.size > 2 && $routeParams.size < 101 ? parseInt($routeParams.size) : 3;
+
+        this.signs = {
+            player: new PlayerSign(),
+            enemy: new EnemySign()
+        }
 
         this.store = new GameStorage();
 
-        this.initGrid($routeParams.size || 3)
-            .then(function(grid){
-                this.grid = grid;
-                this.gridLoaded = true;
-                $scope.$apply();
-            }.bind(this));
+        this.gridLoaded = false;
+
+        this.newGame();
     }
 
     initGrid(size) {
@@ -39,26 +39,70 @@ export default class gameFieldController {
             new PlayerSign()
             : new EnemySign();
 
-        // End game if there is winning lane
-        if (this.grid.isDone()){
-            this.gameEnded = true;
-            return;
-        }
-
-        // Draw if there is no more avaiable cells
-        if (!this.grid.cellsAvaiable()) return;
+        this.saveState();
+        this.isGameEnded();
 
         // Change move turn
         this.playerMove = !this.playerMove;
 
+    }
+
+    isGameEnded() {
+        // End game if there is winning lane
+        if (this.grid.isDone()) {
+            this.gameEnd('player');
+            return;
+        }
+
+        // Draw if there is no more avaiable cells
+        if (!this.grid.cellsAvaiable()) {
+            console.log('draw');
+            this.gameDraw();
+            return;
+        }
+    }
+
+      /**
+       * Save game's state into localstorage
+       */
+    saveState() {
         this.store.state = {
             size: this.grid.size,
             grid: this.grid.cells
         }
-
     }
 
-    endGame() {
+    gameEnd(winner, winLane) {
         this.gameEnded = true;
+        if (winner === 'player') {
+            this.gameStatus = 'You win! Yay';
+        } else {
+            this.gameStatus = 'You lose :(';
+        }
+    }
+
+    gameDraw() {
+        this.gameEnded = true;
+        this.gameStatus = 'Draw';
+    }
+
+    restart() {
+        this.store.clearState();
+        this.grid = null;
+        this.gridLoaded = false;
+        this.newGame();
+    }
+
+    newGame() {
+        this.playerMove = true;
+        this.gameStatus = '';
+        this.gameEnded = false;
+        this.initGrid(this.size)
+            .then((grid)=>{
+                console.log(this);
+                this.grid = grid;
+                this.gridLoaded = true;
+                this.$scope.$apply();
+            });
     }
 }

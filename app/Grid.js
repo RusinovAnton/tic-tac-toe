@@ -33,17 +33,15 @@ class Grid {
     * @returns {Promise}
     */
     getAvaiableCells(){
-        return new Promise((resolve, reject)=>{
-                let avaiableCells = [];
-                this.cells.forEach((row, i)=>{
-                    row.forEach((cell,j)=>{
-                          if (cell === null) {
-                              avaiableCells.push({x:j,y:i});
-                          }
-                    })
-                });
-                resolve(avaiableCells);
+        let avaiableCells = [];
+        this.cells.forEach((row, i)=>{
+            row.forEach((cell,j)=>{
+                if (cell === null) {
+                    avaiableCells.push({x:j,y:i});
+                }
             })
+        });
+        return avaiableCells;
     }
 
     /**

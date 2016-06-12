@@ -86,6 +86,10 @@
 	        if (input === '') return 'empty string';
 	        return input ? input : '' + input;
 	    };
+	}).filter('int', function () {
+	    return function (input) {
+	        return parseInt(input);
+	    };
 	}).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
 	    $locationProvider.hashPrefix('!');
 	    $routeProvider.when('/new', {
@@ -32303,19 +32307,19 @@
 	    function gameFieldController($scope, $routeParams) {
 	        _classCallCheck(this, gameFieldController);
 	
-	        this.playerMove = true;
+	        this.$scope = $scope;
+	        this.size = $routeParams.size > 2 && $routeParams.size < 101 ? parseInt($routeParams.size) : 3;
 	
-	        this.gridLoaded = false;
-	        this.gameStatus = 'WIN';
-	        this.gameEnded = false;
+	        this.signs = {
+	            player: new _Sign.PlayerSign(),
+	            enemy: new _Sign.EnemySign()
+	        };
 	
 	        this.store = new _game2.default();
 	
-	        this.initGrid($routeParams.size || 3).then(function (grid) {
-	            this.grid = grid;
-	            this.gridLoaded = true;
-	            $scope.$apply();
-	        }.bind(this));
+	        this.gridLoaded = false;
+	
+	        this.newGame();
 	    }
 	
 	    _createClass(gameFieldController, [{
@@ -32338,27 +32342,79 @@
 	
 	            this.grid.cells[pos.y][pos.x] = this.playerMove ? new _Sign.PlayerSign() : new _Sign.EnemySign();
 	
+	            this.saveState();
+	            this.isGameEnded();
+	
+	            // Change move turn
+	            this.playerMove = !this.playerMove;
+	        }
+	    }, {
+	        key: 'isGameEnded',
+	        value: function isGameEnded() {
 	            // End game if there is winning lane
 	            if (this.grid.isDone()) {
-	                this.gameEnded = true;
+	                this.gameEnd('player');
 	                return;
 	            }
 	
 	            // Draw if there is no more avaiable cells
-	            if (!this.grid.cellsAvaiable()) return;
+	            if (!this.grid.cellsAvaiable()) {
+	                console.log('draw');
+	                this.gameDraw();
+	                return;
+	            }
+	        }
 	
-	            // Change move turn
-	            this.playerMove = !this.playerMove;
+	        /**
+	         * Save game's state into localstorage
+	         */
 	
+	    }, {
+	        key: 'saveState',
+	        value: function saveState() {
 	            this.store.state = {
 	                size: this.grid.size,
 	                grid: this.grid.cells
 	            };
 	        }
 	    }, {
-	        key: 'endGame',
-	        value: function endGame() {
+	        key: 'gameEnd',
+	        value: function gameEnd(winner, winLane) {
 	            this.gameEnded = true;
+	            if (winner === 'player') {
+	                this.gameStatus = 'You win! Yay';
+	            } else {
+	                this.gameStatus = 'You lose :(';
+	            }
+	        }
+	    }, {
+	        key: 'gameDraw',
+	        value: function gameDraw() {
+	            this.gameEnded = true;
+	            this.gameStatus = 'Draw';
+	        }
+	    }, {
+	        key: 'restart',
+	        value: function restart() {
+	            this.store.clearState();
+	            this.grid = null;
+	            this.gridLoaded = false;
+	            this.newGame();
+	        }
+	    }, {
+	        key: 'newGame',
+	        value: function newGame() {
+	            var _this = this;
+	
+	            this.playerMove = true;
+	            this.gameStatus = '';
+	            this.gameEnded = false;
+	            this.initGrid(this.size).then(function (grid) {
+	                console.log(_this);
+	                _this.grid = grid;
+	                _this.gridLoaded = true;
+	                _this.$scope.$apply();
+	            });
 	        }
 	    }]);
 	
@@ -32423,19 +32479,15 @@
 	    }, {
 	        key: 'getAvaiableCells',
 	        value: function getAvaiableCells() {
-	            var _this = this;
-	
-	            return new Promise(function (resolve, reject) {
-	                var avaiableCells = [];
-	                _this.cells.forEach(function (row, i) {
-	                    row.forEach(function (cell, j) {
-	                        if (cell === null) {
-	                            avaiableCells.push({ x: j, y: i });
-	                        }
-	                    });
+	            var avaiableCells = [];
+	            this.cells.forEach(function (row, i) {
+	                row.forEach(function (cell, j) {
+	                    if (cell === null) {
+	                        avaiableCells.push({ x: j, y: i });
+	                    }
 	                });
-	                resolve(avaiableCells);
 	            });
+	            return avaiableCells;
 	        }
 	
 	        /**
@@ -49074,23 +49126,15 @@
 
 /***/ },
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
-	var _fieldCell = __webpack_require__(17);
-	
-	var _fieldCell2 = _interopRequireDefault(_fieldCell);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
 	var fieldCellComponent = {
 	    templateUrl: 'templates/fieldCell.template.html',
-	    controller: ['$scope', '$element', _fieldCell2.default],
 	    bindings: {
 	        x: '<',
 	        y: '<',
@@ -49100,20 +49144,6 @@
 	};
 	
 	exports.default = fieldCellComponent;
-
-/***/ },
-/* 17 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.default = fieldCellController;
-	function fieldCellController($scope, $element) {
-	    //
-	}
 
 /***/ }
 /******/ ]);

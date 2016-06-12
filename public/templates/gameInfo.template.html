@@ -4,10 +4,14 @@
     </div>
     <div class="signs">
         <p>
-            Your sign: {{$ctrl.playerSign}}
+            Your sign:
+            <i class="fa fa-circle-o" ng-if="$ctrl.playerSign === 0"></i>
+            <i class="fa fa-times" ng-if="$ctrl.playerSign === 1"></i>
         </p>
         <p>
-            Enemy's sign: {{$ctrl.enemySign}}
+            Enemy's sign:
+            <i class="fa fa-circle-o" ng-if="$ctrl.enemySign === 0"></i>
+            <i class="fa fa-times" ng-if="$ctrl.enemySign === 1"></i>
         </p>
     </div>
 </div>

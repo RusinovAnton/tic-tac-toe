@@ -1,11 +1,11 @@
-<div class="game-field-wrapper" ng-init='newGameLink = "#!/new?size=" + $ctrl.grid.size'>
+<div class="game-field-wrapper" ng-init='newGameLink = "#!/new?size=" + $ctrl.size' >
     <span class="animate-spin" ng-if="!$ctrl.gridLoaded">
         <i class="fa fa-spinner"></i>
     </span>
 
     <div class="row-flex">
-        <div class="col">
-            <game-info player-move="$ctrl.playerMove" player-sign="$ctrl.signs.player" enemy-sign="$ctrl.signs.enemy"></game-info>
+        <div class="col text-right">
+            <game-info player-move="$ctrl.playerMove" player-sign="$ctrl.signs.player.body" enemy-sign="$ctrl.signs.enemy.body"></game-info>
         </div>
         <div class="col">
             <div class="game-field m-b" ng-model="$ctrl.grid">
@@ -18,23 +18,29 @@
                         on-move="$ctrl.handleMove(pos)">
                     </field-cell>
                 </div>
+                <div ng-if='$ctrl.gameEnded' class="game-end">
+                    <h1>GAME IS OVER NOW</h1>
+                    <p class="p game-end--message">
+                        <span ng-bind="$ctrl.gameStatus"></span>
+                    </p>
+                </div>
             </div>
         </div>
         <div class="col">
-            <button class="btn btn-red" ng-click="$ctrl.endGame()" title="End game"><i class="fa fa-times"></i></button>
+            <div class="game-actions text-left">
+                <div>
+                    <button class="btn btn-blue" ng-click="$ctrl.restart()">
+                        restart
+                    </button>
+                </div>
+                <div>
+                    <a href="{{newGameLink}}" class="btn btn-blue">
+                        Change grid size <i class="fa fa-reply"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <a href="{{newGameLink}}" class="btn btn-blue">
-        Reset game<i class="fa fa-reply"></i>
-    </a>
-    <div ng-if='$ctrl.gameEnded' class="game-end">
-        <h1>GAME IS OVER NOW</h1>
-        <p class="p game-end--message">
-            You {{$ctrl.gameStatus}}!
-        </p>
-        <a href="{{newGameLink}}" class="btn btn-blue">
-            Play again <i class="fa fa-reply"></i>
-        </a>
-    </div>
+
 </div>
