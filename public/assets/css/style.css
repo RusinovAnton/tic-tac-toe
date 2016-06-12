@@ -89,6 +89,15 @@ main > .container {
     color: #38c119;
 }
 
+.signs .fa-times,
+.field--cell .fa-times {
+    color: #f00;
+}
+.signs .fa-circle-o,
+.field--cell .fa-circle-o {
+    color: #38c119;
+}
+
 .field--cell.highlighted {
     outline: 5px solid #fc0;
 }
