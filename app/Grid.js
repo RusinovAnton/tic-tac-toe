@@ -130,12 +130,12 @@ class Grid {
         function isRowDone() {
           let isDone = false;
 
-            this.forEachRow((row)=>{
+            _self.forEachRow((row)=>{
                 isDone = checkLane(row) || isDone;
             });
 
           return isDone;
-      }.bind(this)
+      }
 
         /**
         * checks every column for winning lane
@@ -144,12 +144,12 @@ class Grid {
         function isColumnDone() {
           let isDone = false;
 
-          this.forEachColumn((col)=>{
+          _self.forEachColumn((col)=>{
               isDone = checkLane(col) || isDone
           });
 
           return isDone;
-      }.bind(this)
+      }
 
         return isDiagonalDone() || isRowDone() || isColumnDone();
     }

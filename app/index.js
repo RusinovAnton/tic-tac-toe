@@ -15,17 +15,6 @@ angular
 
 angular
     .module('ticTacToe')
-    .filter('debug', function () {
-        return function (input) {
-            if (input === '') return 'empty string';
-            return input ? input : ('' + input);
-        };
-    })
-    .filter('int', function(){
-        return function(input){
-            return parseInt(input);
-        }
-    })
     .config(['$locationProvider', '$routeProvider',
         ($locationProvider, $routeProvider) => {
             $locationProvider.hashPrefix('!');
