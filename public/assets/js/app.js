@@ -32229,7 +32229,7 @@
 /* 8 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -32237,9 +32237,11 @@
 	var gameInfoComponent = {
 	    templateUrl: 'templates/gameInfo.template.html',
 	    bindings: {
-	        playerMove: "<",
-	        playerSign: "<",
-	        enemySign: "<"
+	        gameEnded: '<',
+	        gameStatus: '<',
+	        playerMove: '<',
+	        playerSign: '<',
+	        enemySign: '<'
 	    }
 	};
 	
@@ -32283,6 +32285,8 @@
 	var _Grid = __webpack_require__(11);
 	
 	var _Grid2 = _interopRequireDefault(_Grid);
+	
+	var _randomInt = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"../utils/randomInt\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
 	
 	var _Sign = __webpack_require__(14);
 	
@@ -32331,7 +32335,9 @@
 	            // Do nothing if choosen cell isn't empty already
 	            if (this.grid.cells[pos.y][pos.x] !== null) return;
 	
-	            this.grid.cells[pos.y][pos.x] = this.playerMove ? new _Sign.PlayerSign() : new _Sign.EnemySign();
+	            if (!this.playerMove) return;
+	
+	            this.grid.cells[pos.y][pos.x] = new _Sign.PlayerSign();
 	
 	            this.saveState();
 	
@@ -32339,7 +32345,11 @@
 	
 	            // Change move turn
 	            this.playerMove = !this.playerMove;
+	            this.computerMove();
 	        }
+	    }, {
+	        key: 'computerMove',
+	        value: function computerMove() {}
 	    }, {
 	        key: 'isGameEnded',
 	        value: function isGameEnded() {
@@ -32382,6 +32392,7 @@
 	    }, {
 	        key: 'gameEnd',
 	        value: function gameEnd(winner, winLane) {
+	            this.store.clearState();
 	            this.gameEnded = true;
 	            if (winner === 'player') {
 	                this.gameStatus = 'You win! Yay';
@@ -32392,6 +32403,7 @@
 	    }, {
 	        key: 'gameDraw',
 	        value: function gameDraw() {
+	            this.store.clearState();
 	            this.gameEnded = true;
 	            this.gameStatus = 'Draw';
 	        }

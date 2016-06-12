@@ -1,9 +1,11 @@
 let gameInfoComponent = {
     templateUrl: 'templates/gameInfo.template.html',
     bindings: {
-        playerMove: "<",
-        playerSign: "<",
-        enemySign: "<"
+        gameEnded: '<',
+        gameStatus: '<',
+        playerMove: '<',
+        playerSign: '<',
+        enemySign: '<'
     }
 };
 

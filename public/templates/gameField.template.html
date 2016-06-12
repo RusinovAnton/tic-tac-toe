@@ -5,7 +5,7 @@
 
     <div class="row-flex">
         <div class="col text-right">
-            <game-info player-move="$ctrl.playerMove" player-sign="$ctrl.signs.player.body" enemy-sign="$ctrl.signs.enemy.body"></game-info>
+            <game-info game-ended="$ctrl.gameEnded" game-status="$ctrl.gameStatus" player-move="$ctrl.playerMove" player-sign="$ctrl.signs.player.body" enemy-sign="$ctrl.signs.enemy.body"></game-info>
         </div>
         <div class="col">
             <div class="game-field m-b" ng-model="$ctrl.grid">
@@ -17,12 +17,6 @@
                         y="$parent.$index"
                         on-move="$ctrl.handleMove(pos)">
                     </field-cell>
-                </div>
-                <div ng-if='$ctrl.gameEnded' class="game-end">
-                    <h1>GAME IS OVER NOW</h1>
-                    <p class="p game-end--message">
-                        <span ng-bind="$ctrl.gameStatus"></span>
-                    </p>
                 </div>
             </div>
         </div>

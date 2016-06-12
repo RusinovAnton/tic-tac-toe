@@ -1,17 +1,25 @@
 <div class="game-info">
-    <div class="turn">
-        {{$ctrl.playerMove ? 'Your move' : 'Enemy move'}}
+    <div ng-if="!$ctrl.gameEnded">
+        <div class="turn">
+            {{$ctrl.playerMove ? 'Your move' : 'Enemy move'}}
+        </div>
+        <div class="signs">
+            <p>
+                Your sign:
+                <i class="fa fa-circle-o" ng-if="$ctrl.playerSign === 0"></i>
+                <i class="fa fa-times" ng-if="$ctrl.playerSign === 1"></i>
+            </p>
+            <p>
+                Enemy's sign:
+                <i class="fa fa-circle-o" ng-if="$ctrl.enemySign === 0"></i>
+                <i class="fa fa-times" ng-if="$ctrl.enemySign === 1"></i>
+            </p>
+        </div>
     </div>
-    <div class="signs">
-        <p>
-            Your sign:
-            <i class="fa fa-circle-o" ng-if="$ctrl.playerSign === 0"></i>
-            <i class="fa fa-times" ng-if="$ctrl.playerSign === 1"></i>
-        </p>
-        <p>
-            Enemy's sign:
-            <i class="fa fa-circle-o" ng-if="$ctrl.enemySign === 0"></i>
-            <i class="fa fa-times" ng-if="$ctrl.enemySign === 1"></i>
+    <div ng-if="$ctrl.gameEnded">
+        <h1>GAME IS OVER NOW</h1>
+        <p class="p game-end--message">
+            <span ng-bind="$ctrl.gameStatus"></span>
         </p>
     </div>
 </div>

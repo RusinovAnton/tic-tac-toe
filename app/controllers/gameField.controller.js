@@ -1,4 +1,5 @@
 import Grid from '../Grid';
+import {randomInt} from '../utils/randomInt';
 import { PlayerSign, EnemySign } from '../Sign';
 import GameStorage from '../storage/game.storage';
 
@@ -35,9 +36,9 @@ export default class gameFieldController {
         // Do nothing if choosen cell isn't empty already
         if (this.grid.cells[pos.y][pos.x] !== null) return;
 
-        this.grid.cells[pos.y][pos.x] = this.playerMove ?
-            new PlayerSign()
-            : new EnemySign();
+        if (!this.playerMove) return;
+
+        this.grid.cells[pos.y][pos.x] = new PlayerSign();
 
         this.saveState();
 
@@ -45,6 +46,11 @@ export default class gameFieldController {
 
         // Change move turn
         this.playerMove = !this.playerMove;
+        this.computerMove();
+
+    }
+
+    computerMove() {
 
     }
 
@@ -84,6 +90,7 @@ export default class gameFieldController {
     }
 
     gameEnd(winner, winLane) {
+        this.store.clearState();
         this.gameEnded = true;
         if (winner === 'player') {
             this.gameStatus = 'You win! Yay';
@@ -93,6 +100,7 @@ export default class gameFieldController {
     }
 
     gameDraw() {
+        this.store.clearState();
         this.gameEnded = true;
         this.gameStatus = 'Draw';
     }
