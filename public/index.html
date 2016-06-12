@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,width=device-width">
     <title>Tic tac toe</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/app.js"></script>
@@ -10,7 +11,9 @@
 </head>
 <body ng-app="ticTacToe">
     <main role="main">
-        <div ng-view></div>
+        <div class="container">
+            <div ng-view></div>
+        </div>
     </main>
 </body>
 </html>
