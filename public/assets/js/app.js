@@ -32504,14 +32504,18 @@
 	        }
 	    }, {
 	        key: 'gameEnd',
-	        value: function gameEnd(isDoneObj) {
+	        value: function gameEnd(doneState) {
+	
 	            this.store.clearState();
+	
 	            // TODO: find out why it doesnt update view
-	            isDoneObj.lane.forEach(function (cell) {
+	            doneState.lane.forEach(function (cell) {
 	                cell.highlighed = true;
 	            });
+	
 	            this.gameEnded = true;
-	            if (isDoneObj.who === 'player') {
+	
+	            if (doneState.who === 'player') {
 	                this.gameStatus = 'You win! Yay';
 	            } else {
 	                this.gameStatus = 'You lose :(';

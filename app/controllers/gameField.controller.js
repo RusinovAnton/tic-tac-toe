@@ -1,6 +1,6 @@
 import Grid from '../Grid';
 import {randomInt} from '../utils/randomInt';
-import { PlayerSign, EnemySign } from '../Sign';
+import {PlayerSign, EnemySign} from '../Sign';
 import GameStorage from '../storage/game.storage';
 
 import {isUndefined} from 'lodash';
@@ -95,7 +95,7 @@ export default class gameFieldController {
 
         let nextMove = this.predictUserMove() || {x: avaiableCell.x, y: avaiableCell.y};
 
-        setTimeout(()=>{
+        setTimeout(()=> {
             this.$scope.$apply(()=> {
                 this.grid.cells[nextMove.y][nextMove.x] = new EnemySign();
                 if (this.isGameEnded()) return;
@@ -110,7 +110,7 @@ export default class gameFieldController {
         let vector;
         let _self = this;
 
-        function checkVector(vector){
+        function checkVector(vector) {
             // Check if vector is valid. It can be -1, 0, 1
             return (vector.x >= -1 && vector.x <= 1) && (vector.y >= -1 && vector.y <= 1) &&
                 // Check if cell choosen by vector is in the scope of grid
@@ -149,8 +149,8 @@ export default class gameFieldController {
         this.gameStatus = '';
         this.gameEnded = false;
         this.initGrid()
-            .then((grid)=>{
-                this.$scope.$apply(()=>{
+            .then((grid)=> {
+                this.$scope.$apply(()=> {
                         this.grid = grid;
                         this.gridLoaded = true;
                         if (!this.playerMove) {
@@ -195,18 +195,23 @@ export default class gameFieldController {
         return false;
     }
 
-    gameEnd(isDoneObj) {
+    gameEnd(doneState) {
+
         this.store.clearState();
+
         // TODO: find out why it doesnt update view
-        isDoneObj.lane.forEach((cell)=>{
+        doneState.lane.forEach((cell)=> {
             cell.highlighed = true;
         });
+
         this.gameEnded = true;
-        if (isDoneObj.who === 'player') {
+
+        if (doneState.who === 'player') {
             this.gameStatus = 'You win! Yay';
         } else {
             this.gameStatus = 'You lose :(';
         }
+
     }
 
     gameDraw() {
