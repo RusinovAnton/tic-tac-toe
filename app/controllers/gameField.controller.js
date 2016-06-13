@@ -6,6 +6,7 @@ import GameStorage from '../storage/game.storage';
 import {isUndefined} from 'lodash';
 
 export default class gameFieldController {
+
     constructor($scope, $routeParams) {
 
         this.$scope = $scope;
@@ -21,7 +22,6 @@ export default class gameFieldController {
         this.size = this.setGridSize($routeParams.size, this.store.state);
 
         this.startGame()
-
     }
 
     initStore() {
@@ -196,23 +196,23 @@ export default class gameFieldController {
         return false;
     }
 
+    highlightLane(lane) {
+        lane.forEach((cell) => {
+           cell.highlighted = true;
+        });
+    }
+
     gameEnd(doneState) {
-
         this.store.clearState();
-
-        //// TODO: find out why it doesnt update view
-        //this.cells[doneState[i]].forEach((cell)=> {
-        //    cell.highlighed = true;
-        //});
-
         this.gameEnded = true;
+
+        this.highlightLane(doneState.lane);
 
         if (doneState.who === 'player') {
             this.gameStatus = 'You win! Yay';
         } else {
             this.gameStatus = 'You lose :(';
         }
-
     }
 
     gameDraw() {

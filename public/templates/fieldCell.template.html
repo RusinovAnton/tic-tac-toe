@@ -1,4 +1,4 @@
-<div class="field--cell {{$ctrl.sign.highligthed ? ' highlighted' : ''}}" ng-model="$ctrl.sign" ng-click="$ctrl.onMove({pos: {x: $ctrl.x, y: $ctrl.y}})">
+<div class="field--cell {{$ctrl.sign.highlighted ? ' highlighted' : ''}}" ng-model="$ctrl.sign" ng-click="$ctrl.onMove({pos: {x: $ctrl.x, y: $ctrl.y}})">
     <i class="fa fa-circle-o" ng-if="$ctrl.sign.body === 0"></i>
     <i class="fa fa-times" ng-if="$ctrl.sign.body === 1"></i>
 </div>

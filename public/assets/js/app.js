@@ -32504,17 +32504,20 @@
 	            return false;
 	        }
 	    }, {
+	        key: 'highlightLane',
+	        value: function highlightLane(lane) {
+	            lane.forEach(function (cell) {
+	                cell.highlighted = true;
+	            });
+	        }
+	    }, {
 	        key: 'gameEnd',
 	        value: function gameEnd(doneState) {
 	
 	            this.store.clearState();
-	
-	            //// TODO: find out why it doesnt update view
-	            //this.cells[doneState[i]].forEach((cell)=> {
-	            //    cell.highlighed = true;
-	            //});
-	
 	            this.gameEnded = true;
+	
+	            this.highlightLane(doneState.lane);
 	
 	            if (doneState.who === 'player') {
 	                this.gameStatus = 'You win! Yay';
@@ -32762,18 +32765,12 @@
 	                if ((0, _lodash.every)(lane, { who: 'player' })) {
 	                    doneState = {
 	                        who: 'player',
-	                        lane: {
-	                            i: i,
-	                            type: type
-	                        }
+	                        lane: lane
 	                    };
 	                } else if ((0, _lodash.every)(lane, { who: 'enemy' })) {
 	                    doneState = {
 	                        who: 'enemy',
-	                        lane: {
-	                            i: i,
-	                            type: type
-	                        }
+	                        lane: lane
 	                    };
 	                }
 	            });

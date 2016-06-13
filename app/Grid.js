@@ -184,18 +184,12 @@ class Grid {
             if (every(lane, {who: 'player'})) {
                 doneState = {
                     who: 'player',
-                    lane: {
-                        i,
-                        type
-                    }
+                    lane
                 };
             } else if (every(lane, {who: 'enemy'})) {
                 doneState = {
                     who: 'enemy',
-                    lane: {
-                        i,
-                        type
-                    }
+                    lane
                 }
             }
         });
