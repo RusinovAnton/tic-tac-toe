@@ -200,10 +200,10 @@ export default class gameFieldController {
 
         this.store.clearState();
 
-        // TODO: find out why it doesnt update view
-        doneState.lane.forEach((cell)=> {
-            cell.highlighed = true;
-        });
+        //// TODO: find out why it doesnt update view
+        //this.cells[doneState[i]].forEach((cell)=> {
+        //    cell.highlighed = true;
+        //});
 
         this.gameEnded = true;
 

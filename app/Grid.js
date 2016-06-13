@@ -109,9 +109,31 @@ class Grid {
         return diagonal;
     }
 
+    getRow(index) {
+        return this.cells[index];
+    }
+
+    getColumn(index) {
+        let col = [];
+        // Iterates throw each grids' row and compose column array
+        this.forEachRow((row)=> {
+            col.push(row[index]);
+        });
+
+        return col;
+    }
+
+    getDiagonal(index){
+        return [
+            this.getFirstDiagonal(),
+            this.getSecondDiagonal()
+        ][index];
+    }
+
     forEachDiagonal(cb) {
-        cb(this.getFirstDiagonal(), 1, 'diagonal');
-        cb(this.getSecondDiagonal(), 2, 'diagonal');
+        for (var i = 0;i<2;i++){
+            cb(this.getDiagonal(i), i, 'diagonal');
+        }
     }
 
     /**
@@ -121,9 +143,8 @@ class Grid {
      */
     forEachRow(cb) {
         let i = 0;
-        console.log(this.size);
         for (i;i<this.size;i++){
-            cb(this.cells[i], i, 'row');
+            cb(this.getRow(i), i, 'row');
         }
     }
 
@@ -135,13 +156,7 @@ class Grid {
     forEachColumn(cb) {
         let i = 0;
         for (i; i < this.size; i++) {
-            let col = [];
-            // Iterates throw each grids' row and compose column array
-            this.forEachRow((row)=> {
-                col.push(row[i]);
-            });
-            // Then pass column array to the given callback function
-            cb(col, i, 'column');
+            cb(this.getColumn(i), i, 'column');
         }
     }
 
@@ -169,12 +184,18 @@ class Grid {
             if (every(lane, {who: 'player'})) {
                 doneState = {
                     who: 'player',
-                    lane
+                    lane: {
+                        i,
+                        type
+                    }
                 };
             } else if (every(lane, {who: 'enemy'})) {
                 doneState = {
                     who: 'enemy',
-                    lane
+                    lane: {
+                        i,
+                        type
+                    }
                 }
             }
         });
@@ -185,7 +206,6 @@ class Grid {
     getPossibleWinLanes() {
         let possibleWinLanes = [];
         this.forEachLane((lane, i, type)=>{
-            console.log(lane, i, type);
             if (!(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}))) possibleWinLanes.push(lane);
         });
         return possibleWinLanes;
