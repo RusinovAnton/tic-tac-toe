@@ -32368,9 +32368,15 @@
 	        key: 'predictUserMove',
 	        value: function predictUserMove() {
 	            var vector = void 0;
+	            var _self = this;
 	
 	            function checkVector(vector) {
-	                return vector.x >= -1 && vector.x <= 1 && vector.y >= -1 && vector.y <= 1;
+	                // Check if vector is valid. It can be -1, 0, 1
+	                return vector.x >= -1 && vector.x <= 1 && vector.y >= -1 && vector.y <= 1 &&
+	                // Check if cell choosen by vector is in the scope of grid
+	                _self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size && _self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size &&
+	                // Check if cell is empty
+	                _self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x] === null;
 	            }
 	
 	            if (this.moves.length >= 2) {
@@ -32454,7 +32460,6 @@
 	            isDoneObj.lane.forEach(function (cell) {
 	                cell.highlighed = true;
 	            });
-	            this.grid = this.grid;
 	            this.gameEnded = true;
 	            if (isDoneObj.who === 'player') {
 	                this.gameStatus = 'You win! Yay';
@@ -32495,6 +32500,9 @@
 	                    }
 	                });
 	            });
+	            if (!this.playerMove) {
+	                this.computerMove();
+	            }
 	        }
 	    }]);
 	
