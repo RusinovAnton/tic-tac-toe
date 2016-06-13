@@ -32305,6 +32305,7 @@
 	        _classCallCheck(this, gameFieldController);
 	
 	        this.$scope = $scope;
+	        this.apply = $scope.apply;
 	
 	        this.signs = {
 	            player: new _Sign.PlayerSign(),
@@ -32315,7 +32316,7 @@
 	
 	        this.size = this.setGridSize($routeParams.size, this.store.state);
 	
-	        this.newGame();
+	        this.startGame();
 	    }
 	
 	    _createClass(gameFieldController, [{
@@ -32451,8 +32452,8 @@
 	            };
 	        }
 	    }, {
-	        key: 'newGame',
-	        value: function newGame() {
+	        key: 'startGame',
+	        value: function startGame() {
 	            var _this3 = this;
 	
 	            this.gameStatus = '';
@@ -32475,14 +32476,14 @@
 	            this.gridLoaded = false;
 	            this.moves = [];
 	            this.playerMove = true;
-	            this.newGame();
+	            this.startGame();
 	        }
 	    }, {
 	        key: 'isGameEnded',
 	        value: function isGameEnded() {
 	
 	            // Draw when there is no way to win
-	            if (!this.grid.possibleWin()) {
+	            if (!this.grid.isPossibleWin()) {
 	                this.gameDraw();
 	                return true;
 	            }
@@ -32555,38 +32556,47 @@
 	    function Grid(size, prevState) {
 	        _classCallCheck(this, Grid);
 	
-	        this.cells = [];
+	        if (!(0, _lodash.isNumber)(size) && !!!prevState) throw new Error('Size must be a number');
+	
 	        if (prevState === null) {
 	            this.size = size;
-	            this.empty();
+	            this.cells = this.empty(this.size);
 	        } else {
 	            this.size = prevState.size;
-	            this.fromState(prevState);
+	            this.prevState = prevState;
+	            this.cells = this.fromState();
 	        }
 	    }
 	
 	    _createClass(Grid, [{
 	        key: 'empty',
 	        value: function empty() {
+	            var cells = [];
 	            var i, j;
 	            for (i = 0; i < this.size; i++) {
-	                this.cells[i] = [];
+	                cells[i] = [];
 	                for (j = 0; j < this.size; j++) {
 	                    // Empty cell
-	                    this.cells[i][j] = null;
+	                    cells[i][j] = null;
 	                }
 	            }
+	            return cells;
 	        }
 	    }, {
 	        key: 'fromState',
-	        value: function fromState(state) {
+	        value: function fromState() {
+	
+	            var cells = [];
+	
 	            var i, j;
-	            for (i = 0; i < state.size; i++) {
-	                this.cells[i] = [];
-	                for (j = 0; j < state.size; j++) {
-	                    this.cells[i][j] = (0, _lodash.cloneDeep)(state.cells[i][j]);
+	            for (i = 0; i < this.prevState.size; i++) {
+	                cells[i] = [];
+	                for (j = 0; j < this.prevState.size; j++) {
+	                    cells[i][j] = (0, _lodash.cloneDeep)(this.prevState.cells[i][j]);
 	                }
 	            }
+	
+	            return cells;
 	        }
 	
 	        /**
@@ -32662,6 +32672,12 @@
 	            }
 	            return diagonal;
 	        }
+	    }, {
+	        key: 'forEachDiagonal',
+	        value: function forEachDiagonal(cb) {
+	            cb(this.getFirstDiagonal(), 1, 'diagonal');
+	            cb(this.getSecondDiagonal(), 2, 'diagonal');
+	        }
 	
 	        /**
 	         * Iterates throw all grids' rows and applies given callback
@@ -32672,7 +32688,11 @@
 	    }, {
 	        key: 'forEachRow',
 	        value: function forEachRow(cb) {
-	            return this.cells.forEach(cb);
+	            var i = 0;
+	            console.log(this.size);
+	            for (i; i < this.size; i++) {
+	                cb(this.cells[i], i, 'row');
+	            }
 	        }
 	
 	        /**
@@ -32695,12 +32715,25 @@
 	                    col.push(row[i]);
 	                });
 	                // Then pass column array to the given callback function
-	                cb(col);
+	                cb(col, i, 'column');
 	            };
 	
 	            for (i; i < this.size; i++) {
 	                _loop();
 	            }
+	        }
+	
+	        /**
+	        * Iterates over each lane in grid applying provided callback function
+	        * @param cb
+	        */
+	
+	    }, {
+	        key: 'forEachLane',
+	        value: function forEachLane(cb) {
+	            this.forEachDiagonal(cb);
+	            this.forEachRow(cb);
+	            this.forEachColumn(cb);
 	        }
 	
 	        /**
@@ -32743,20 +32776,34 @@
 	    }, {
 	        key: 'isDone',
 	        value: function isDone() {
-	            return this.checkLanes(function (lane) {
+	
+	            var doneState = void 0;
+	
+	            this.forEachLane(function (lane, i, type) {
 	                if ((0, _lodash.every)(lane, { who: 'player' })) {
-	                    return {
+	                    doneState = {
 	                        who: 'player',
 	                        lane: lane
 	                    };
 	                } else if ((0, _lodash.every)(lane, { who: 'enemy' })) {
-	                    return {
+	                    doneState = {
 	                        who: 'enemy',
 	                        lane: lane
 	                    };
 	                }
-	                return false;
 	            });
+	
+	            return doneState || false;
+	        }
+	    }, {
+	        key: 'getPossibleWinLanes',
+	        value: function getPossibleWinLanes() {
+	            var possibleWinLanes = [];
+	            this.forEachLane(function (lane, i, type) {
+	                console.log(lane, i, type);
+	                if (!((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }))) possibleWinLanes.push(lane);
+	            });
+	            return possibleWinLanes;
 	        }
 	
 	        /**
@@ -32768,11 +32815,9 @@
 	         */
 	
 	    }, {
-	        key: 'possibleWin',
-	        value: function possibleWin(turn) {
-	            return this.checkLanes(function (lane) {
-	                return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
-	            });
+	        key: 'isPossibleWin',
+	        value: function isPossibleWin() {
+	            return this.getPossibleWinLanes().length !== 0;
 	        }
 	    }]);
 	

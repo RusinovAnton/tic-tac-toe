@@ -9,6 +9,7 @@ export default class gameFieldController {
     constructor($scope, $routeParams) {
 
         this.$scope = $scope;
+        this.apply = $scope.apply;
 
         this.signs = {
             player: new PlayerSign(),
@@ -19,7 +20,7 @@ export default class gameFieldController {
 
         this.size = this.setGridSize($routeParams.size, this.store.state);
 
-        this.newGame()
+        this.startGame()
 
     }
 
@@ -145,7 +146,7 @@ export default class gameFieldController {
         }
     }
 
-    newGame() {
+    startGame() {
         this.gameStatus = '';
         this.gameEnded = false;
         this.initGrid()
@@ -167,14 +168,14 @@ export default class gameFieldController {
         this.gridLoaded = false;
         this.moves = [];
         this.playerMove = true;
-        this.newGame();
+        this.startGame();
     }
 
 
     isGameEnded() {
 
         // Draw when there is no way to win
-        if (!this.grid.possibleWin()) {
+        if (!this.grid.isPossibleWin()) {
             this.gameDraw();
             return true;
         }

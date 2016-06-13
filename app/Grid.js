@@ -1,39 +1,50 @@
 'use strict';
 
-import {every, some, cloneDeep} from 'lodash';
+import {every, some, cloneDeep, isNumber} from 'lodash';
 
 class Grid {
 
     constructor(size, prevState) {
-        this.cells = []
+
+        if (!isNumber(size) && !!!prevState) throw new Error('Size must be a number');
+
         if (prevState === null) {
             this.size = size
-            this.empty();
+            this.cells = this.empty(this.size);
         } else {
             this.size = prevState.size;
-            this.fromState(prevState);
+            this.prevState = prevState;
+            this.cells = this.fromState();
         }
     }
 
     empty() {
+
+        let cells = [];
         var i, j;
         for (i = 0; i < this.size; i++) {
-            this.cells[i] = [];
+            cells[i] = [];
             for (j = 0; j < this.size; j++) {
                 // Empty cell
-                this.cells[i][j] = null;
+                cells[i][j] = null;
             }
         }
+        return cells;
     }
 
-    fromState(state) {
+    fromState() {
+
+        let cells = [];
+
         var i, j;
-        for (i = 0; i < state.size; i++) {
-            this.cells[i] = [];
-            for (j = 0; j < state.size; j++) {
-                this.cells[i][j] = cloneDeep(state.cells[i][j]);
+        for (i = 0; i < this.prevState.size; i++) {
+            cells[i] = [];
+            for (j = 0; j < this.prevState.size; j++) {
+                cells[i][j] = cloneDeep(this.prevState.cells[i][j]);
             }
         }
+
+        return cells;
     }
 
     /**
@@ -98,13 +109,22 @@ class Grid {
         return diagonal;
     }
 
+    forEachDiagonal(cb) {
+        cb(this.getFirstDiagonal(), 1, 'diagonal');
+        cb(this.getSecondDiagonal(), 2, 'diagonal');
+    }
+
     /**
      * Iterates throw all grids' rows and applies given callback
      *
      * @param {Function} cb - callback
      */
     forEachRow(cb) {
-        return this.cells.forEach(cb);
+        let i = 0;
+        console.log(this.size);
+        for (i;i<this.size;i++){
+            cb(this.cells[i], i, 'row');
+        }
     }
 
     /**
@@ -121,35 +141,18 @@ class Grid {
                 col.push(row[i]);
             });
             // Then pass column array to the given callback function
-            cb(col);
+            cb(col, i, 'column');
         }
     }
 
     /**
-     * This method takes checker function (checkLane)
-     * and goes throw all grids' lanes (which are arrays from diagonales, rows, columns)
-     * and returns true if there are at least one match for checker
-     *
-     * @param checkLane
-     * @returns {boolean}
-     */
-    checkLanes(checkLane) {
-        let isValid = false;
-
-        // Check diagonals
-        isValid = checkLane(this.getFirstDiagonal()) || checkLane(this.getSecondDiagonal()) || isValid;
-
-        // Check rows
-        this.forEachRow((row)=> {
-            isValid = checkLane(row) || isValid;
-        });
-
-        // Check columns
-        this.forEachColumn((col)=> {
-            isValid = checkLane(col) || isValid
-        });
-
-        return isValid;
+    * Iterates over each lane in grid applying provided callback function
+    * @param cb
+    */
+    forEachLane(cb) {
+        this.forEachDiagonal(cb);
+        this.forEachRow(cb);
+        this.forEachColumn(cb);
     }
 
     /**
@@ -159,20 +162,33 @@ class Grid {
      * @returns {bool}
      */
     isDone() {
-        return this.checkLanes((lane) => {
+
+        let doneState;
+
+        this.forEachLane((lane, i, type) => {
             if (every(lane, {who: 'player'})) {
-                return {
+                doneState = {
                     who: 'player',
                     lane
-                }
+                };
             } else if (every(lane, {who: 'enemy'})) {
-                return {
+                doneState = {
                     who: 'enemy',
                     lane
                 }
             }
-            return false;
         });
+
+        return doneState || false;
+    }
+
+    getPossibleWinLanes() {
+        let possibleWinLanes = [];
+        this.forEachLane((lane, i, type)=>{
+            console.log(lane, i, type);
+            if (!(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}))) possibleWinLanes.push(lane);
+        });
+        return possibleWinLanes;
     }
 
     /**
@@ -182,11 +198,10 @@ class Grid {
      *
      * @returns {boolean}
      */
-    possibleWin(turn) {
-        return this.checkLanes((lane) => {
-            return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
-        });
+    isPossibleWin() {
+        return this.getPossibleWinLanes().length !== 0;
     }
+
 }
 
 export default Grid
