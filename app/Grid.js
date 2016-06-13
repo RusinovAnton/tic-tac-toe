@@ -1,6 +1,6 @@
 'use strict';
 
-import {every, some, cloneDeep, isNumber} from 'lodash';
+import {every, some, cloneDeep, isNumber, isArray} from 'lodash';
 
 class Grid {
 
@@ -52,15 +52,24 @@ class Grid {
      *   e.g
      *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
      */
-    getAvaiableCells() {
+    getAvaiableCells(lane, i) {
         let avaiableCells = [];
-        this.cells.forEach((row, i)=> {
-            row.forEach((cell, j)=> {
+        if (isArray(lane) && isNumber(i)) {
+            lane.forEach((_, j)=>{
                 if (cell === null) {
                     avaiableCells.push({x: j, y: i});
                 }
             })
-        });
+        }
+        else {
+            this.cells.forEach((row, i)=> {
+                row.forEach((cell, j)=> {
+                    if (cell === null) {
+                        avaiableCells.push({x: j, y: i});
+                    }
+                })
+            });
+        }
         return avaiableCells;
     }
 
@@ -130,6 +139,11 @@ class Grid {
         ][index];
     }
 
+    /**
+     * Iterates over both diagonales and applies given callback
+     *
+     * @param {Function} cb(lane, index, laneType)
+     */
     forEachDiagonal(cb) {
         for (var i = 0;i<2;i++){
             cb(this.getDiagonal(i), i, 'diagonal');
@@ -139,7 +153,7 @@ class Grid {
     /**
      * Iterates throw all grids' rows and applies given callback
      *
-     * @param {Function} cb - callback
+     * @param {Function} cb(lane, index, laneType)
      */
     forEachRow(cb) {
         let i = 0;
@@ -151,7 +165,7 @@ class Grid {
     /**
      * Iterates throw all grids' columns and applies given callback
      *
-     * @param cb
+     * @param {Function} cb(lane, index, laneType)
      */
     forEachColumn(cb) {
         let i = 0;
@@ -161,9 +175,10 @@ class Grid {
     }
 
     /**
-    * Iterates over each lane in grid applying provided callback function
-    * @param cb
-    */
+     * Iterates over each lane in grid applying provided callback function
+     *
+     * @param {Function} cb(lane, index, laneType)
+     */
     forEachLane(cb) {
         this.forEachDiagonal(cb);
         this.forEachRow(cb);
@@ -172,9 +187,8 @@ class Grid {
 
     /**
      * Checks if there are lanes with all players' or all enemy's signs in it
-     * Returns true if there are a winning line
      *
-     * @returns {bool}
+     * @returns {bool} true if there are a winning lane
      */
     isDone() {
 
@@ -199,16 +213,14 @@ class Grid {
 
     getPossibleWinLanes() {
         let possibleWinLanes = [];
-        this.forEachLane((lane, i, type)=>{
+        this.forEachLane((lane)=>{
             if (!(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}))) possibleWinLanes.push(lane);
         });
         return possibleWinLanes;
     }
 
     /**
-     * Check if there are lanes which impossible to win because
-     * there are both players' and enemys' signs on them
-     * returns true if it is possible to win lane
+     * returns true if there are lanes in array possible
      *
      * @returns {boolean}
      */

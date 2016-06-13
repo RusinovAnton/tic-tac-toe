@@ -48,7 +48,6 @@ export default class gameFieldController {
                 return state.size;
             }
         }
-
     }
 
     initGrid() {
@@ -104,7 +103,6 @@ export default class gameFieldController {
                 this.saveState();
             });
         }, 500);
-
     }
 
     predictUserMove() {
@@ -170,7 +168,6 @@ export default class gameFieldController {
         this.playerMove = true;
         this.startGame();
     }
-
 
     isGameEnded() {
 
