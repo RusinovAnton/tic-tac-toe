@@ -32294,6 +32294,8 @@
 	
 	var _game2 = _interopRequireDefault(_game);
 	
+	var _lodash = __webpack_require__(12);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -32304,26 +32306,47 @@
 	
 	        this.$scope = $scope;
 	
-	        this.size = $routeParams.size > 2 && $routeParams.size < 101 ? parseInt($routeParams.size) : 3;
-	
 	        this.signs = {
 	            player: new _Sign.PlayerSign(),
 	            enemy: new _Sign.EnemySign()
 	        };
 	
-	        this.store = new _game2.default();
-	        if (this.store.state) {
-	            this.playerMove = this.store.state.playerMove || true;
-	            this.moves = this.store.state.moves || [];
-	        } else {
-	            this.playerMove = true;
-	            this.moves = [];
-	        }
+	        this.initStore();
+	
+	        this.size = this.setGridSize($routeParams.size, this.store.state);
 	
 	        this.newGame();
 	    }
 	
 	    _createClass(gameFieldController, [{
+	        key: 'initStore',
+	        value: function initStore() {
+	            this.store = new _game2.default();
+	            if (this.store.state) {
+	                this.playerMove = this.store.state.playerMove;
+	                this.moves = this.store.state.moves || [];
+	            } else {
+	                this.playerMove = true;
+	                this.moves = [];
+	            }
+	        }
+	    }, {
+	        key: 'setGridSize',
+	        value: function setGridSize(routeSize, state) {
+	
+	            if (!(0, _lodash.isUndefined)(routeSize)) {
+	                routeSize = routeSize >= 3 && routeSize <= 100 ? parseInt(routeSize) : 3;
+	                if (state !== null) {
+	                    if (state.size !== routeSize) this.store.clearState();
+	                }
+	                return routeSize;
+	            } else {
+	                if (state !== null) {
+	                    return state.size;
+	                }
+	            }
+	        }
+	    }, {
 	        key: 'initGrid',
 	        value: function initGrid() {
 	            var _this = this;
@@ -32332,14 +32355,6 @@
 	                resolve(new _Grid2.default(_this.size, _this.store.state));
 	                reject();
 	            });
-	        }
-	    }, {
-	        key: 'storeMove',
-	        value: function storeMove(pos) {
-	            if (this.moves.length >= 2) {
-	                this.moves.shift();
-	            }
-	            this.moves.push(pos);
 	        }
 	    }, {
 	        key: 'handleMove',
@@ -32356,13 +32371,42 @@
 	
 	            this.grid.cells[pos.y][pos.x] = new _Sign.PlayerSign();
 	
-	            this.saveState();
-	
 	            if (this.isGameEnded()) return;
 	
 	            // Change move turn
 	            this.playerMove = !this.playerMove;
+	
 	            this.computerMove();
+	            this.saveState();
+	        }
+	    }, {
+	        key: 'storeMove',
+	        value: function storeMove(pos) {
+	            if (this.moves.length >= 2) {
+	                this.moves.shift();
+	            }
+	            this.moves.push(pos);
+	        }
+	    }, {
+	        key: 'computerMove',
+	        value: function computerMove() {
+	            var _this2 = this;
+	
+	            // Do nothing if game ended
+	            if (this.gameEnded) return;
+	
+	            var avaiableCell = this.grid.getAvaiableCells()[0];
+	
+	            var nextMove = this.predictUserMove() || { x: avaiableCell.x, y: avaiableCell.y };
+	
+	            setTimeout(function () {
+	                _this2.$scope.$apply(function () {
+	                    _this2.grid.cells[nextMove.y][nextMove.x] = new _Sign.EnemySign();
+	                    if (_this2.isGameEnded()) return;
+	                    _this2.playerMove = !_this2.playerMove;
+	                    _this2.saveState();
+	                });
+	            }, 500);
 	        }
 	    }, {
 	        key: 'predictUserMove',
@@ -32391,26 +32435,47 @@
 	
 	            return false;
 	        }
+	
+	        /**
+	         * Save game's state into localstorage
+	         */
+	
 	    }, {
-	        key: 'computerMove',
-	        value: function computerMove() {
-	            var _this2 = this;
+	        key: 'saveState',
+	        value: function saveState() {
+	            this.store.state = {
+	                size: this.grid.size,
+	                cells: this.grid.cells,
+	                moves: this.moves,
+	                playerMove: this.playerMove
+	            };
+	        }
+	    }, {
+	        key: 'newGame',
+	        value: function newGame() {
+	            var _this3 = this;
 	
-	            // Do nothing if game ended
-	            if (this.gameEnded) return;
-	
-	            var avaiableCell = this.grid.getAvaiableCells()[0];
-	
-	            var nextMove = this.predictUserMove() || { x: avaiableCell.x, y: avaiableCell.y };
-	
-	            setTimeout(function () {
-	                _this2.$scope.$apply(function () {
-	                    _this2.grid.cells[nextMove.y][nextMove.x] = new _Sign.EnemySign();
-	                    _this2.saveState();
-	                    _this2.isGameEnded();
-	                    _this2.playerMove = !_this2.playerMove;
+	            this.gameStatus = '';
+	            this.gameEnded = false;
+	            this.initGrid().then(function (grid) {
+	                _this3.$scope.$apply(function () {
+	                    _this3.grid = grid;
+	                    _this3.gridLoaded = true;
+	                    if (!_this3.playerMove) {
+	                        _this3.computerMove();
+	                    }
 	                });
-	            }, 500);
+	            });
+	        }
+	    }, {
+	        key: 'restart',
+	        value: function restart() {
+	            this.store.clearState();
+	            this.grid = null;
+	            this.gridLoaded = false;
+	            this.moves = [];
+	            this.playerMove = true;
+	            this.newGame();
 	        }
 	    }, {
 	        key: 'isGameEnded',
@@ -32437,21 +32502,6 @@
 	
 	            return false;
 	        }
-	
-	        /**
-	         * Save game's state into localstorage
-	         */
-	
-	    }, {
-	        key: 'saveState',
-	        value: function saveState() {
-	            this.store.state = {
-	                size: this.grid.size,
-	                cells: this.grid.cells,
-	                moves: this.moves,
-	                playerMove: this.playerMove
-	            };
-	        }
 	    }, {
 	        key: 'gameEnd',
 	        value: function gameEnd(isDoneObj) {
@@ -32473,36 +32523,6 @@
 	            this.store.clearState();
 	            this.gameEnded = true;
 	            this.gameStatus = 'Draw';
-	        }
-	    }, {
-	        key: 'restart',
-	        value: function restart() {
-	            this.store.clearState();
-	            this.grid = null;
-	            this.gridLoaded = false;
-	            this.moves = [];
-	            this.playerMove = true;
-	            this.newGame();
-	        }
-	    }, {
-	        key: 'newGame',
-	        value: function newGame() {
-	            var _this3 = this;
-	
-	            this.gameStatus = '';
-	            this.gameEnded = false;
-	            this.initGrid().then(function (grid) {
-	                _this3.$scope.$apply(function () {
-	                    _this3.grid = grid;
-	                    _this3.gridLoaded = true;
-	                    if (!_this3.playerMove) {
-	                        _this3.computerMove();
-	                    }
-	                });
-	            });
-	            if (!this.playerMove) {
-	                this.computerMove();
-	            }
 	        }
 	    }]);
 	

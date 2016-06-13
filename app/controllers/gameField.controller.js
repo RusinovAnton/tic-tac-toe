@@ -3,43 +3,58 @@ import {randomInt} from '../utils/randomInt';
 import { PlayerSign, EnemySign } from '../Sign';
 import GameStorage from '../storage/game.storage';
 
+import {isUndefined} from 'lodash';
+
 export default class gameFieldController {
     constructor($scope, $routeParams) {
 
         this.$scope = $scope;
 
-        this.size = $routeParams.size > 2 && $routeParams.size < 101 ? parseInt($routeParams.size) : 3;
-
         this.signs = {
             player: new PlayerSign(),
             enemy: new EnemySign()
-        }
+        };
 
+        this.initStore();
+
+        this.size = this.setGridSize($routeParams.size, this.store.state);
+
+        this.newGame()
+
+    }
+
+    initStore() {
         this.store = new GameStorage();
         if (this.store.state) {
-            this.playerMove = this.store.state.playerMove || true;
+            this.playerMove = this.store.state.playerMove;
             this.moves = this.store.state.moves || [];
         } else {
             this.playerMove = true;
             this.moves = [];
         }
+    }
 
+    setGridSize(routeSize, state) {
 
-        this.newGame();
+        if (!isUndefined(routeSize)) {
+            routeSize = routeSize >= 3 && routeSize <= 100 ? parseInt(routeSize) : 3;
+            if (state !== null) {
+                if (state.size !== routeSize) this.store.clearState();
+            }
+            return routeSize;
+        } else {
+            if (state !== null) {
+                return state.size;
+            }
+        }
+
     }
 
     initGrid() {
         return new Promise((resolve, reject) => {
-                resolve(new Grid(this.size, this.store.state));
-                reject();
-            });
-    }
-
-    storeMove(pos) {
-        if (this.moves.length >= 2) {
-            this.moves.shift();
-        }
-        this.moves.push(pos);
+            resolve(new Grid(this.size, this.store.state));
+            reject();
+        });
     }
 
     handleMove(pos) {
@@ -55,13 +70,39 @@ export default class gameFieldController {
 
         this.grid.cells[pos.y][pos.x] = new PlayerSign();
 
-        this.saveState();
-
         if (this.isGameEnded()) return;
 
         // Change move turn
         this.playerMove = !this.playerMove;
+
         this.computerMove();
+        this.saveState();
+    }
+
+    storeMove(pos) {
+        if (this.moves.length >= 2) {
+            this.moves.shift();
+        }
+        this.moves.push(pos);
+    }
+
+    computerMove() {
+
+        // Do nothing if game ended
+        if (this.gameEnded) return;
+
+        var avaiableCell = this.grid.getAvaiableCells()[0];
+
+        let nextMove = this.predictUserMove() || {x: avaiableCell.x, y: avaiableCell.y};
+
+        setTimeout(()=>{
+            this.$scope.$apply(()=> {
+                this.grid.cells[nextMove.y][nextMove.x] = new EnemySign();
+                if (this.isGameEnded()) return;
+                this.playerMove = !this.playerMove;
+                this.saveState();
+            });
+        }, 500);
 
     }
 
@@ -72,11 +113,11 @@ export default class gameFieldController {
         function checkVector(vector){
             // Check if vector is valid. It can be -1, 0, 1
             return (vector.x >= -1 && vector.x <= 1) && (vector.y >= -1 && vector.y <= 1) &&
-            // Check if cell choosen by vector is in the scope of grid
-            (_self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size) &&
-            (_self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size) &&
-            // Check if cell is empty
-            (_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x] === null)
+                // Check if cell choosen by vector is in the scope of grid
+                (_self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size) &&
+                (_self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size) &&
+                // Check if cell is empty
+                (_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x] === null)
         }
 
         if (this.moves.length >= 2) {
@@ -92,25 +133,43 @@ export default class gameFieldController {
         return false;
     }
 
-    computerMove() {
-
-        // Do nothing if game ended
-        if (this.gameEnded) return;
-
-        var avaiableCell = this.grid.getAvaiableCells()[0];
-
-        let nextMove = this.predictUserMove() || {x: avaiableCell.x, y: avaiableCell.y};
-
-        setTimeout(()=>{
-            this.$scope.$apply(()=> {
-                this.grid.cells[nextMove.y][nextMove.x] = new EnemySign();
-                this.saveState();
-                this.isGameEnded();
-                this.playerMove = !this.playerMove;
-            });
-        }, 500);
-
+    /**
+     * Save game's state into localstorage
+     */
+    saveState() {
+        this.store.state = {
+            size: this.grid.size,
+            cells: this.grid.cells,
+            moves: this.moves,
+            playerMove: this.playerMove
+        }
     }
+
+    newGame() {
+        this.gameStatus = '';
+        this.gameEnded = false;
+        this.initGrid()
+            .then((grid)=>{
+                this.$scope.$apply(()=>{
+                        this.grid = grid;
+                        this.gridLoaded = true;
+                        if (!this.playerMove) {
+                            this.computerMove();
+                        }
+                    }
+                )
+            });
+    }
+
+    restart() {
+        this.store.clearState();
+        this.grid = null;
+        this.gridLoaded = false;
+        this.moves = [];
+        this.playerMove = true;
+        this.newGame();
+    }
+
 
     isGameEnded() {
 
@@ -136,18 +195,6 @@ export default class gameFieldController {
         return false;
     }
 
-    /**
-     * Save game's state into localstorage
-     */
-    saveState() {
-        this.store.state = {
-            size: this.grid.size,
-            cells: this.grid.cells,
-            moves: this.moves,
-            playerMove: this.playerMove
-        }
-    }
-
     gameEnd(isDoneObj) {
         this.store.clearState();
         // TODO: find out why it doesnt update view
@@ -166,33 +213,5 @@ export default class gameFieldController {
         this.store.clearState();
         this.gameEnded = true;
         this.gameStatus = 'Draw';
-    }
-
-    restart() {
-        this.store.clearState();
-        this.grid = null;
-        this.gridLoaded = false;
-        this.moves = [];
-        this.playerMove = true;
-        this.newGame();
-    }
-
-    newGame() {
-        this.gameStatus = '';
-        this.gameEnded = false;
-        this.initGrid()
-            .then((grid)=>{
-                this.$scope.$apply(()=>{
-                        this.grid = grid;
-                        this.gridLoaded = true;
-                        if (!this.playerMove) {
-                            this.computerMove();
-                        }
-                    }
-                )
-            });
-        if (!this.playerMove) {
-            this.computerMove();
-        }
     }
 }
