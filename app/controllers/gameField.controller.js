@@ -66,11 +66,11 @@ export default class gameFieldController {
         if (this.gameEnded) return;
 
         // Do nothing if choosen cell isn't empty already
-        if (!this.grid.isEmpty(this.grid.cells[pos.y][pos.x])) return;
+        if (!this.grid.isEmpty(this.grid.getCell(pos))) return;
 
         if (!this.playerMove) return;
 
-        this.grid.cells[pos.y][pos.x] = new PlayerSign(pos);
+        this.grid.setCell(pos,new PlayerSign(pos));
 
         if (this.isGameEnded()) return;
 
@@ -101,7 +101,7 @@ export default class gameFieldController {
 
         setTimeout(()=> {
             this.$scope.$apply(()=> {
-                this.grid.cells[nextMove.y][nextMove.x] = new EnemySign(nextMove);
+                this.grid.setCell(nextMove, new EnemySign(nextMove));
                 if (this.isGameEnded()) return;
                 this.playerMove = !this.playerMove;
                 this.saveState();
@@ -113,23 +113,26 @@ export default class gameFieldController {
         let vector;
         let _self = this;
 
+        let prevMove = this.moves[0]
+        let lastMove = this.moves[1];
+
         function checkVector(vector) {
             // Check if vector is valid. It can be -1, 0, 1
             return (vector.x >= -1 && vector.x <= 1) && (vector.y >= -1 && vector.y <= 1) &&
                 // Check if cell choosen by vector is in the scope of grid
-                (_self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size) &&
-                (_self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size) &&
+                (lastMove.x + vector.x >= 0 && lastMove.x + vector.x < _self.size) &&
+                (lastMove.y + vector.y >= 0 && lastMove.y + vector.y < _self.size) &&
                 // Check if cell is empty
-                (_self.grid.isEmpty(_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x]))
+                (_self.grid.isEmpty(_self.grid.cells[lastMove.y + vector.y][lastMove.x + vector.x]))
         }
 
         if (this.moves.length >= 2) {
             vector = {
-                x: this.moves[1].x - this.moves[0].x,
-                y: this.moves[1].y - this.moves[0].y
+                x: lastMove.x - prevMove.x,
+                y: lastMove.y - prevMove.y
             };
             if (checkVector(vector)) {
-                return {x: this.moves[1].x + vector.x, y: this.moves[1].y + vector.y}
+                return {x: lastMove.x + vector.x, y: lastMove.y + vector.y}
             }
         }
 

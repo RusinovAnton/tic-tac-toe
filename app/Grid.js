@@ -2,7 +2,7 @@
 
 import {EmptySign} from './Sign';
 
-import {every, some, cloneDeep, isNumber, isArray} from 'lodash';
+import {every, some, cloneDeep, isNumber, isArray, isObject} from 'lodash';
 
 class Grid {
 
@@ -53,6 +53,24 @@ class Grid {
         return cells;
     }
 
+    setCell(pos, body) {
+
+        if (pos.x >= this.size || pos.y >= this.size) throw new Error('Unavaiable position');
+
+        if (!isObject(pos)) throw new Error('Expected pos to be an object');
+
+        if (isUndefined(pos.x) && isUndefined(pos.y)) throw new Error('There is no coordinates in the pos obj');
+
+        this.cells[pos.y][pos.x] = body;
+
+        return true;
+
+    }
+
+    getCell(pos) {
+        return this.cells[pos.y][pos.x];
+    }
+
     /**
      *   Returns array of objects with coordinates of avaiable cells
      *   e.g
@@ -70,9 +88,7 @@ class Grid {
         else {
             this.cells.forEach((row, i)=> {
                 row.forEach((cell, j)=> {
-                    if (this.isEmpty(cell)) {
-                        avaiableCells.push({x: j, y: i});
-                    }
+                    if (this.isEmpty(cell)) avaiableCells.push(cell.pos);
                 })
             });
         }

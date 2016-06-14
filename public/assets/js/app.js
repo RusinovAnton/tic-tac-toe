@@ -32366,11 +32366,11 @@
 	            if (this.gameEnded) return;
 	
 	            // Do nothing if choosen cell isn't empty already
-	            if (!this.grid.isEmpty(this.grid.cells[pos.y][pos.x])) return;
+	            if (!this.grid.isEmpty(this.grid.getCell(pos))) return;
 	
 	            if (!this.playerMove) return;
 	
-	            this.grid.cells[pos.y][pos.x] = new _Sign.PlayerSign(pos);
+	            this.grid.setCell(pos, new _Sign.PlayerSign(pos));
 	
 	            if (this.isGameEnded()) return;
 	
@@ -32402,7 +32402,7 @@
 	
 	            setTimeout(function () {
 	                _this2.$scope.$apply(function () {
-	                    _this2.grid.cells[nextMove.y][nextMove.x] = new _Sign.EnemySign(nextMove);
+	                    _this2.grid.setCell(nextMove, new _Sign.EnemySign(nextMove));
 	                    if (_this2.isGameEnded()) return;
 	                    _this2.playerMove = !_this2.playerMove;
 	                    _this2.saveState();
@@ -32415,22 +32415,25 @@
 	            var vector = void 0;
 	            var _self = this;
 	
+	            var prevMove = this.moves[0];
+	            var lastMove = this.moves[1];
+	
 	            function checkVector(vector) {
 	                // Check if vector is valid. It can be -1, 0, 1
 	                return vector.x >= -1 && vector.x <= 1 && vector.y >= -1 && vector.y <= 1 &&
 	                // Check if cell choosen by vector is in the scope of grid
-	                _self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size && _self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size &&
+	                lastMove.x + vector.x >= 0 && lastMove.x + vector.x < _self.size && lastMove.y + vector.y >= 0 && lastMove.y + vector.y < _self.size &&
 	                // Check if cell is empty
-	                _self.grid.isEmpty(_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x]);
+	                _self.grid.isEmpty(_self.grid.cells[lastMove.y + vector.y][lastMove.x + vector.x]);
 	            }
 	
 	            if (this.moves.length >= 2) {
 	                vector = {
-	                    x: this.moves[1].x - this.moves[0].x,
-	                    y: this.moves[1].y - this.moves[0].y
+	                    x: lastMove.x - prevMove.x,
+	                    y: lastMove.y - prevMove.y
 	                };
 	                if (checkVector(vector)) {
-	                    return { x: this.moves[1].x + vector.x, y: this.moves[1].y + vector.y };
+	                    return { x: lastMove.x + vector.x, y: lastMove.y + vector.y };
 	                }
 	            }
 	
@@ -32622,6 +32625,25 @@
 	
 	            return cells;
 	        }
+	    }, {
+	        key: 'setCell',
+	        value: function setCell(pos, body) {
+	
+	            if (pos.x >= this.size || pos.y >= this.size) throw new Error('Unavaiable position');
+	
+	            if (!(0, _lodash.isObject)(pos)) throw new Error('Expected pos to be an object');
+	
+	            if (isUndefined(pos.x) && isUndefined(pos.y)) throw new Error('There is no coordinates in the pos obj');
+	
+	            this.cells[pos.y][pos.x] = body;
+	
+	            return true;
+	        }
+	    }, {
+	        key: 'getCell',
+	        value: function getCell(pos) {
+	            return this.cells[pos.y][pos.x];
+	        }
 	
 	        /**
 	         *   Returns array of objects with coordinates of avaiable cells
@@ -32644,9 +32666,7 @@
 	            } else {
 	                this.cells.forEach(function (row, i) {
 	                    row.forEach(function (cell, j) {
-	                        if (_this.isEmpty(cell)) {
-	                            avaiableCells.push({ x: j, y: i });
-	                        }
+	                        if (_this.isEmpty(cell)) avaiableCells.push(cell.pos);
 	                    });
 	                });
 	            }
