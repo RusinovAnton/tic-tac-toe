@@ -1,5 +1,7 @@
 'use strict';
 
+import {EmptySign} from './Sign';
+
 import {every, some, cloneDeep, isNumber, isArray} from 'lodash';
 
 class Grid {
@@ -18,6 +20,10 @@ class Grid {
         }
     }
 
+    isEmpty(cell) {
+        return cell.body === 'empty';
+    }
+
     empty() {
 
         let cells = [];
@@ -26,7 +32,7 @@ class Grid {
             cells[i] = [];
             for (j = 0; j < this.size; j++) {
                 // Empty cell
-                cells[i][j] = null;
+                cells[i][j] = new EmptySign({x:j, y:i});
             }
         }
         return cells;
@@ -56,7 +62,7 @@ class Grid {
         let avaiableCells = [];
         if (isArray(lane) && isNumber(i)) {
             lane.forEach((_, j)=>{
-                if (cell === null) {
+                if (this.isEmpty(cell)) {
                     avaiableCells.push({x: j, y: i});
                 }
             })
@@ -64,7 +70,7 @@ class Grid {
         else {
             this.cells.forEach((row, i)=> {
                 row.forEach((cell, j)=> {
-                    if (cell === null) {
+                    if (this.isEmpty(cell)) {
                         avaiableCells.push({x: j, y: i});
                     }
                 })
@@ -213,8 +219,11 @@ class Grid {
 
     getPossibleWinLanes() {
         let possibleWinLanes = [];
-        this.forEachLane((lane)=>{
-            if (!(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}))) possibleWinLanes.push(lane);
+        this.forEachLane((lane, index)=>{
+            if (!(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}))) {
+                lane.$index = index;
+                possibleWinLanes.push(lane);
+            }
         });
         return possibleWinLanes;
     }

@@ -32286,15 +32286,15 @@
 	
 	var _Grid2 = _interopRequireDefault(_Grid);
 	
-	var _randomInt = __webpack_require__(14);
+	var _randomInt = __webpack_require__(15);
 	
-	var _Sign = __webpack_require__(15);
+	var _Sign = __webpack_require__(12);
 	
 	var _game = __webpack_require__(16);
 	
 	var _game2 = _interopRequireDefault(_game);
 	
-	var _lodash = __webpack_require__(12);
+	var _lodash = __webpack_require__(13);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -32366,11 +32366,11 @@
 	            if (this.gameEnded) return;
 	
 	            // Do nothing if choosen cell isn't empty already
-	            if (this.grid.cells[pos.y][pos.x] !== null) return;
+	            if (!this.grid.isEmpty(this.grid.cells[pos.y][pos.x])) return;
 	
 	            if (!this.playerMove) return;
 	
-	            this.grid.cells[pos.y][pos.x] = new _Sign.PlayerSign();
+	            this.grid.cells[pos.y][pos.x] = new _Sign.PlayerSign(pos);
 	
 	            if (this.isGameEnded()) return;
 	
@@ -32398,11 +32398,11 @@
 	
 	            var avaiableCell = this.grid.getAvaiableCells()[0];
 	
-	            var nextMove = this.predictUserMove() || { x: avaiableCell.x, y: avaiableCell.y };
+	            var nextMove = this.predictUserMove() || this.possibleWinMove() || { x: avaiableCell.x, y: avaiableCell.y };
 	
 	            setTimeout(function () {
 	                _this2.$scope.$apply(function () {
-	                    _this2.grid.cells[nextMove.y][nextMove.x] = new _Sign.EnemySign();
+	                    _this2.grid.cells[nextMove.y][nextMove.x] = new _Sign.EnemySign(nextMove);
 	                    if (_this2.isGameEnded()) return;
 	                    _this2.playerMove = !_this2.playerMove;
 	                    _this2.saveState();
@@ -32421,7 +32421,7 @@
 	                // Check if cell choosen by vector is in the scope of grid
 	                _self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size && _self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size &&
 	                // Check if cell is empty
-	                _self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x] === null;
+	                _self.grid.isEmpty(_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x]);
 	            }
 	
 	            if (this.moves.length >= 2) {
@@ -32432,6 +32432,20 @@
 	                if (checkVector(vector)) {
 	                    return { x: this.moves[1].x + vector.x, y: this.moves[1].y + vector.y };
 	                }
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'possibleWinMove',
+	        value: function possibleWinMove() {
+	
+	            var possibleWinLanes = this.grid.getPossibleWinLanes().filter(function (lane) {
+	                return !(0, _lodash.some)(lane, { who: 'player' });
+	            });
+	
+	            if (!possibleWinLanes.length) {
+	                return false;
 	            }
 	
 	            return false;
@@ -32513,7 +32527,6 @@
 	    }, {
 	        key: 'gameEnd',
 	        value: function gameEnd(doneState) {
-	
 	            this.store.clearState();
 	            this.gameEnded = true;
 	
@@ -32551,7 +32564,9 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _lodash = __webpack_require__(12);
+	var _Sign = __webpack_require__(12);
+	
+	var _lodash = __webpack_require__(13);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -32572,6 +32587,11 @@
 	    }
 	
 	    _createClass(Grid, [{
+	        key: 'isEmpty',
+	        value: function isEmpty(cell) {
+	            return cell.body === 'empty';
+	        }
+	    }, {
 	        key: 'empty',
 	        value: function empty() {
 	
@@ -32581,7 +32601,7 @@
 	                cells[i] = [];
 	                for (j = 0; j < this.size; j++) {
 	                    // Empty cell
-	                    cells[i][j] = null;
+	                    cells[i][j] = new _Sign.EmptySign({ x: j, y: i });
 	                }
 	            }
 	            return cells;
@@ -32611,15 +32631,25 @@
 	
 	    }, {
 	        key: 'getAvaiableCells',
-	        value: function getAvaiableCells() {
+	        value: function getAvaiableCells(lane, i) {
+	            var _this = this;
+	
 	            var avaiableCells = [];
-	            this.cells.forEach(function (row, i) {
-	                row.forEach(function (cell, j) {
-	                    if (cell === null) {
+	            if ((0, _lodash.isArray)(lane) && (0, _lodash.isNumber)(i)) {
+	                lane.forEach(function (_, j) {
+	                    if (_this.isEmpty(cell)) {
 	                        avaiableCells.push({ x: j, y: i });
 	                    }
 	                });
-	            });
+	            } else {
+	                this.cells.forEach(function (row, i) {
+	                    row.forEach(function (cell, j) {
+	                        if (_this.isEmpty(cell)) {
+	                            avaiableCells.push({ x: j, y: i });
+	                        }
+	                    });
+	                });
+	            }
 	            return avaiableCells;
 	        }
 	
@@ -32697,6 +32727,13 @@
 	        value: function getDiagonal(index) {
 	            return [this.getFirstDiagonal(), this.getSecondDiagonal()][index];
 	        }
+	
+	        /**
+	         * Iterates over both diagonales and applies given callback
+	         *
+	         * @param {Function} cb(lane, index, laneType)
+	         */
+	
 	    }, {
 	        key: 'forEachDiagonal',
 	        value: function forEachDiagonal(cb) {
@@ -32708,7 +32745,7 @@
 	        /**
 	         * Iterates throw all grids' rows and applies given callback
 	         *
-	         * @param {Function} cb - callback
+	         * @param {Function} cb(lane, index, laneType)
 	         */
 	
 	    }, {
@@ -32723,7 +32760,7 @@
 	        /**
 	         * Iterates throw all grids' columns and applies given callback
 	         *
-	         * @param cb
+	         * @param {Function} cb(lane, index, laneType)
 	         */
 	
 	    }, {
@@ -32736,9 +32773,10 @@
 	        }
 	
 	        /**
-	        * Iterates over each lane in grid applying provided callback function
-	        * @param cb
-	        */
+	         * Iterates over each lane in grid applying provided callback function
+	         *
+	         * @param {Function} cb(lane, index, laneType)
+	         */
 	
 	    }, {
 	        key: 'forEachLane',
@@ -32750,9 +32788,8 @@
 	
 	        /**
 	         * Checks if there are lanes with all players' or all enemy's signs in it
-	         * Returns true if there are a winning line
 	         *
-	         * @returns {bool}
+	         * @returns {bool} true if there are a winning lane
 	         */
 	
 	    }, {
@@ -32781,16 +32818,17 @@
 	        key: 'getPossibleWinLanes',
 	        value: function getPossibleWinLanes() {
 	            var possibleWinLanes = [];
-	            this.forEachLane(function (lane, i, type) {
-	                if (!((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }))) possibleWinLanes.push(lane);
+	            this.forEachLane(function (lane, index) {
+	                if (!((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }))) {
+	                    lane.$index = index;
+	                    possibleWinLanes.push(lane);
+	                }
 	            });
 	            return possibleWinLanes;
 	        }
 	
 	        /**
-	         * Check if there are lanes which impossible to win because
-	         * there are both players' and enemys' signs on them
-	         * returns true if it is possible to win lane
+	         * returns true if there are lanes in array possible
 	         *
 	         * @returns {boolean}
 	         */
@@ -32809,6 +32847,71 @@
 
 /***/ },
 /* 12 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Sign = function Sign(who, body, pos) {
+	    _classCallCheck(this, Sign);
+	
+	    this.who = who;
+	    this.body = body;
+	    this.pos = pos;
+	};
+	
+	var PlayerSign = function (_Sign) {
+	    _inherits(PlayerSign, _Sign);
+	
+	    function PlayerSign(pos) {
+	        _classCallCheck(this, PlayerSign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(PlayerSign).call(this, 'player', 0, pos));
+	    }
+	
+	    return PlayerSign;
+	}(Sign);
+	
+	var EnemySign = function (_Sign2) {
+	    _inherits(EnemySign, _Sign2);
+	
+	    function EnemySign(pos) {
+	        _classCallCheck(this, EnemySign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EnemySign).call(this, 'enemy', 1, pos));
+	    }
+	
+	    return EnemySign;
+	}(Sign);
+	
+	var EmptySign = function (_Sign3) {
+	    _inherits(EmptySign, _Sign3);
+	
+	    function EmptySign(pos) {
+	        _classCallCheck(this, EmptySign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EmptySign).call(this, 'empty', 'empty', pos));
+	    }
+	
+	    return EmptySign;
+	}(Sign);
+	
+	exports.Sign = Sign;
+	exports.PlayerSign = PlayerSign;
+	exports.EnemySign = EnemySign;
+	exports.EmptySign = EmptySign;
+
+/***/ },
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -49216,10 +49319,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)(module), (function() { return this; }())))
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -49235,7 +49338,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -49247,57 +49350,6 @@
 	function randomInt(min, max) {
 	    return Math.floor(Math.random() * (max - min)) + min;
 	}
-
-/***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Sign = function Sign(who, body) {
-	    _classCallCheck(this, Sign);
-	
-	    this.who = who;
-	    this.body = body;
-	};
-	
-	var PlayerSign = function (_Sign) {
-	    _inherits(PlayerSign, _Sign);
-	
-	    function PlayerSign(body) {
-	        _classCallCheck(this, PlayerSign);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(PlayerSign).call(this, 'player', 0));
-	    }
-	
-	    return PlayerSign;
-	}(Sign);
-	
-	var EnemySign = function (_Sign2) {
-	    _inherits(EnemySign, _Sign2);
-	
-	    function EnemySign(body) {
-	        _classCallCheck(this, EnemySign);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EnemySign).call(this, 'enemy', 1));
-	    }
-	
-	    return EnemySign;
-	}(Sign);
-	
-	exports.Sign = Sign;
-	exports.PlayerSign = PlayerSign;
-	exports.EnemySign = EnemySign;
 
 /***/ },
 /* 16 */

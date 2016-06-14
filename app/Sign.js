@@ -1,20 +1,27 @@
 class Sign {
-    constructor(who, body){
+    constructor(who, body, pos){
         this.who = who;
         this.body = body;
+        this.pos = pos;
     }
 }
 
 class PlayerSign extends Sign {
-    constructor(body){
-        super('player', 0);
+    constructor(pos){
+        super('player', 0, pos);
     }
 }
 
 class EnemySign extends Sign {
-    constructor(body) {
-        super('enemy', 1)
+    constructor(pos) {
+        super('enemy', 1, pos)
     }
 }
 
-export { Sign, PlayerSign, EnemySign }
+class EmptySign extends Sign {
+    constructor(pos) {
+        super('empty', 'empty', pos)
+    }
+}
+
+export { Sign, PlayerSign, EnemySign, EmptySign }

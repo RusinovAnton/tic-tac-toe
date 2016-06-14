@@ -1,9 +1,11 @@
+'use strict';
+
 import Grid from '../Grid';
 import {randomInt} from '../utils/randomInt';
 import {PlayerSign, EnemySign} from '../Sign';
 import GameStorage from '../storage/game.storage';
 
-import {isUndefined} from 'lodash';
+import {isUndefined, some} from 'lodash';
 
 export default class gameFieldController {
 
@@ -64,11 +66,11 @@ export default class gameFieldController {
         if (this.gameEnded) return;
 
         // Do nothing if choosen cell isn't empty already
-        if (this.grid.cells[pos.y][pos.x] !== null) return;
+        if (!this.grid.isEmpty(this.grid.cells[pos.y][pos.x])) return;
 
         if (!this.playerMove) return;
 
-        this.grid.cells[pos.y][pos.x] = new PlayerSign();
+        this.grid.cells[pos.y][pos.x] = new PlayerSign(pos);
 
         if (this.isGameEnded()) return;
 
@@ -93,11 +95,13 @@ export default class gameFieldController {
 
         var avaiableCell = this.grid.getAvaiableCells()[0];
 
-        let nextMove = this.predictUserMove() || {x: avaiableCell.x, y: avaiableCell.y};
+        let nextMove = this.predictUserMove() ||
+            this.possibleWinMove() ||
+            {x: avaiableCell.x, y: avaiableCell.y};
 
         setTimeout(()=> {
             this.$scope.$apply(()=> {
-                this.grid.cells[nextMove.y][nextMove.x] = new EnemySign();
+                this.grid.cells[nextMove.y][nextMove.x] = new EnemySign(nextMove);
                 if (this.isGameEnded()) return;
                 this.playerMove = !this.playerMove;
                 this.saveState();
@@ -116,7 +120,7 @@ export default class gameFieldController {
                 (_self.moves[1].x + vector.x >= 0 && _self.moves[1].x + vector.x < _self.size) &&
                 (_self.moves[1].y + vector.y >= 0 && _self.moves[1].y + vector.y < _self.size) &&
                 // Check if cell is empty
-                (_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x] === null)
+                (_self.grid.isEmpty(_self.grid.cells[_self.moves[1].y + vector.y][_self.moves[1].x + vector.x]))
         }
 
         if (this.moves.length >= 2) {
@@ -127,6 +131,20 @@ export default class gameFieldController {
             if (checkVector(vector)) {
                 return {x: this.moves[1].x + vector.x, y: this.moves[1].y + vector.y}
             }
+        }
+
+        return false;
+    }
+
+    possibleWinMove() {
+
+        let possibleWinLanes = this.grid.getPossibleWinLanes().filter((lane)=>{
+            return !some(lane, {who: 'player'});
+        });
+
+
+        if (!possibleWinLanes.length) {
+            return false;
         }
 
         return false;

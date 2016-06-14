@@ -48,4 +48,8 @@ gulp.task('watch', ['test', 'app'], function () {
     gulp.watch('./app/**/*.js', ['app']);
 });
 
+gulp.task('watch:test', ['test'], function(){
+    gulp.watch('./tests/**/*.test.js', ['test']);
+});
+
 gulp.task('default', ['app']);
