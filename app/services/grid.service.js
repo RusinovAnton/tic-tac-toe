@@ -1,23 +1,39 @@
 'use strict';
 
-import {EmptySign} from './Sign';
+import {EmptySign} from '../Sign';
 
-import {every, some, cloneDeep, isNumber, isArray, isObject} from 'lodash';
+import {every, some, cloneDeep, isNumber, isArray, isObject, isUndefined} from 'lodash';
 
-class Grid {
+export default class Grid {
 
-    constructor(size, prevState) {
+    constructor() {
+        this.gridInited = false;
+    }
 
-        if (!isNumber(size) && !!!prevState) throw new Error('Size must be a number');
+    init(size, prevState) {
 
-        if (prevState === null) {
-            this.size = size
-            this.cells = this.empty(this.size);
-        } else {
-            this.size = prevState.size;
-            this.prevState = prevState;
-            this.cells = this.fromState();
-        }
+        if (!isNumber(size) && !prevState) throw new Error('Size must be a number');
+
+        return new Promise((resolve, reject) => {
+            console.log(this);
+            try {
+                if (prevState === null) {
+                    this.size = size;
+                    this.cells = this.empty(this.size);
+                } else {
+                    this.size = prevState.size;
+                    this.prevState = prevState;
+                    this.cells = this.fromState();
+                }
+
+                this.gridInited = true;
+                resolve(true);
+
+            } catch(err) {
+                reject(err);
+            }
+
+        });
     }
 
     isEmpty(cell) {
@@ -255,4 +271,4 @@ class Grid {
 
 }
 
-export default Grid
+

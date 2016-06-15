@@ -3,7 +3,7 @@
 import {assert, expect} from 'chai';
 import {isArray} from 'lodash';
 
-import Grid from '../app/Grid';
+import Grid from '../app/services/grid.service';
 
 describe('Grid()', ()=>{
 
