@@ -1,3 +1,5 @@
+'use strict';
+
 export default class GameStorage {
     constructor() {
         this.storage = window.localStorage || false;

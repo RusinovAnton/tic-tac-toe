@@ -8,7 +8,7 @@
             <game-info game-ended="$ctrl.gameEnded" game-status="$ctrl.gameStatus" player-move="$ctrl.playerMove" player-sign="$ctrl.signs.player.body" enemy-sign="$ctrl.signs.enemy.body"></game-info>
         </div>
         <div class="col">
-            <div class="game-field m-b">
+            <div class="game-field m-b{{$ctrl.gameEnded ? ' game-ended' : ''}}">
                 <div class="row" ng-repeat="row in $ctrl.grid.cells">
                     <field-cell
                         ng-repeat="item in row track by $index"

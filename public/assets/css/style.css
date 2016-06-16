@@ -76,6 +76,10 @@ main > .container {
     border: 1px solid #ccc;
 }
 
+.game-field.game-ended .field--cell:not(.highlighted){
+    opacity: 0.5;
+}
+
 .field--cell {
     display: inline-block;
     font-size: 20px;
@@ -103,8 +107,12 @@ main > .container {
     color: #38c119;
 }
 
+.field--cell>i {
+    line-height: 40px;
+}
+
 .field--cell.highlighted {
-    outline: 5px solid #fc0;
+    background: rgba(255, 204, 0, 0.45);
 }
 
 .btn {

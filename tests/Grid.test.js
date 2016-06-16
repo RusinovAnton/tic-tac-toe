@@ -71,6 +71,7 @@ describe('Grid()', ()=> {
                 });
         });
     });
+
     describe('fromState()', ()=> {
         it('should return grid from state', function (done) {
             this.timeout(10000);
@@ -143,5 +144,4 @@ describe('Grid()', ()=> {
         });
     });
 
-})
-;
+});
