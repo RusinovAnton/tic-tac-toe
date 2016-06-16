@@ -127,7 +127,7 @@ export default class gameFieldController {
         this.gameStatus = '';
         this.gameEnded = false;
         if (!this.playerMove) {
-            this.enemy.move();
+            this.enemyMove();
         }
     }
 
