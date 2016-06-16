@@ -16,7 +16,7 @@ export default class Grid {
 
         return new Promise((resolve, reject) => {
             try {
-                if (prevState === null) {
+                if (prevState === null || isUndefined(prevState)) {
                     this.size = size;
                     this.cells = this.empty(this.size);
                 } else {
@@ -78,8 +78,6 @@ export default class Grid {
         if (isUndefined(pos.x) && isUndefined(pos.y)) throw new Error('There is no coordinates in the pos obj');
 
         this.cells[pos.y][pos.x] = body;
-
-        console.log(this.cells);
 
         return true;
 
@@ -252,10 +250,13 @@ export default class Grid {
         return doneState || false;
     }
 
-    getPossibleWinLanes() {
+    getPossibleWinLanes(who) {
+
+        who = who || 'player';
+
         let possibleWinLanes = [];
         this.forEachLane((lane, index)=>{
-            if (!(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}))) {
+            if (!(some(lane, {who: who}) && some(lane, {who: 'enemy'}))) {
                 lane.$index = index;
                 possibleWinLanes.push(lane);
             }

@@ -20,9 +20,9 @@ export default class gameFieldController {
             enemy: new EnemySign()
         };
 
-        this.initStore();
-
         this.enemy = new Enemy();
+
+        this.initStore();
 
         this.setGridSize($routeParams.size, this.store.state);
 
@@ -37,7 +37,7 @@ export default class gameFieldController {
         this.store = new GameStorage();
         if (this.store.state) {
             this.playerMove = this.store.state.playerMove;
-            this.moves = this.store.state.moves || [];
+            this.enemy.userMoves = this.store.state.moves || [];
         } else {
             this.playerMove = true;
             this.moves = [];
@@ -59,8 +59,10 @@ export default class gameFieldController {
     }
 
     initGrid() {
-        this.grid = this.grid || new Grid();
+
+        this.grid = new Grid();
         this.enemy.grid = this.grid;
+
         this.grid.init(this.size, this.store.state)
             .then((succes) => {
                 if (succes) {
@@ -73,6 +75,9 @@ export default class gameFieldController {
 
     handleMove(pos) {
 
+        // Do nothing if its not users' turn now
+        if (!this.playerMove) return;
+
         this.enemy.storeUserMove(pos);
 
         // Do nothing if game ended
@@ -80,8 +85,6 @@ export default class gameFieldController {
 
         // Do nothing if choosen cell isn't empty already
         if (!this.grid.isEmpty(this.grid.getCell(pos))) return;
-
-        if (!this.playerMove) return;
 
         this.grid.setCell(pos, new PlayerSign(pos));
 
@@ -115,7 +118,7 @@ export default class gameFieldController {
         this.store.state = {
             size: this.grid.size,
             cells: this.grid.cells,
-            moves: this.moves,
+            moves: this.enemy.userMoves,
             playerMove: this.playerMove
         }
     }

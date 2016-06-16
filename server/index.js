@@ -1,11 +1,11 @@
 'use strict';
 
 const port          = '8888';
+const path          = require('path');
 const http          = require('http');
 const app           = require('express')();
 const favicon       = require('serve-favicon');
 const serveStatic   = require('serve-static');
-const path          = require('path');
 
 app.use(favicon(path.join(__dirname, '../public/favicon.ico')));
 app.use(serveStatic(path.join(__dirname, '../public')));
