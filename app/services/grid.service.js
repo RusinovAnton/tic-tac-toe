@@ -250,13 +250,15 @@ export default class Grid {
         return doneState || false;
     }
 
-    getPossibleWinLanes(who) {
+    isPossibleWinLane(lane) {
+        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
+    }
 
-        who = who || 'player';
+    getPossibleWinLanes(who) {
 
         let possibleWinLanes = [];
         this.forEachLane((lane, index)=>{
-            if (!(some(lane, {who: who}) && some(lane, {who: 'enemy'}))) {
+            if (this.isPossibleWinLane(lane)) {
                 lane.$index = index;
                 possibleWinLanes.push(lane);
             }
