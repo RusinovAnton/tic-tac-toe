@@ -28,7 +28,7 @@ export default class Grid {
                 this.gridInited = true;
                 resolve(true);
 
-            } catch(err) {
+            } catch (err) {
                 reject(err);
             }
 
@@ -43,7 +43,7 @@ export default class Grid {
             cells[i] = [];
             for (j = 0; j < this.size; j++) {
                 // Empty cell
-                cells[i][j] = new EmptySign({x:j, y:i});
+                cells[i][j] = new EmptySign({x: j, y: i});
             }
         }
         return cells;
@@ -65,7 +65,9 @@ export default class Grid {
     }
 
     isEmpty(cell) {
-        if (cell === void 0) {throw new Error('Argument is undefined');}
+        if (cell === void 0) {
+            throw new Error('Argument is undefined');
+        }
         return cell.body === 'empty';
     }
 
@@ -97,11 +99,11 @@ export default class Grid {
         let avaiableCells = [];
 
         if (isArray(lane)) {
-                lane.forEach((_, j)=>{
-                    if (this.isEmpty(cell)) {
-                        avaiableCells.push(cell.pos);
-                    }
-                })
+            lane.forEach((_, j)=> {
+                if (this.isEmpty(cell)) {
+                    avaiableCells.push(cell.pos);
+                }
+            })
         } else {
             this.cells.forEach((row)=> {
                 row.forEach((cell)=> {
@@ -171,7 +173,7 @@ export default class Grid {
         return col;
     }
 
-    getDiagonal(index){
+    getDiagonal(index) {
         return [
             this.getFirstDiagonal(),
             this.getSecondDiagonal()
@@ -184,7 +186,7 @@ export default class Grid {
      * @param {Function} cb(lane, index, laneType)
      */
     forEachDiagonal(cb) {
-        for (var i = 0;i<2;i++){
+        for (var i = 0; i < 2; i++) {
             cb(this.getDiagonal(i), i, 'diagonal');
         }
     }
@@ -196,7 +198,7 @@ export default class Grid {
      */
     forEachRow(cb) {
         let i = 0;
-        for (i;i<this.size;i++){
+        for (i; i < this.size; i++) {
             cb(this.getRow(i), i, 'row');
         }
     }
@@ -250,19 +252,30 @@ export default class Grid {
         return doneState || false;
     }
 
-    isPossibleWinLane(lane) {
+    isLaneWinnableBy(who) {
+        let opposite = who === 'player' ? 'enemy' : 'player';
+        return (some(lane, {who: who}) && !some(lane, {who: opposite})) ||
+            every(lane, {body: 'empty'});
+
+    }
+
+    isLaneWinnable(lane) {
         return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
     }
 
-    getPossibleWinLanes(who) {
+    getWinnableLanes(who) {
 
         let possibleWinLanes = [];
-        this.forEachLane((lane, index)=>{
-            if (this.isPossibleWinLane(lane)) {
-                lane.$index = index;
-                possibleWinLanes.push(lane);
+
+        this.forEachLane((lane, index)=> {
+            if (!isUndefined(who) && !isLaneWinnableBy(who)) {
+                return;
+            } else if (!this.isLaneWinnable(lane)) {
+                return;
             }
+            possibleWinLanes.push(lane);
         });
+
         return possibleWinLanes;
     }
 
@@ -271,10 +284,8 @@ export default class Grid {
      *
      * @returns {boolean}
      */
-    isPossibleWin() {
-        return this.getPossibleWinLanes().length !== 0;
+    isWinnable() {
+        return this.getWinnableLanes().length !== 0;
     }
 
 }
-
-

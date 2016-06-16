@@ -74,7 +74,7 @@ export default class Enemy {
 
     possibleWinMove() {
 
-        let possibleWinLanes = this._grid.getPossibleWinLanes().filter((lane)=> {
+        let possibleWinLanes = this._grid.getWinnableLanes().filter((lane)=> {
             return !some(lane, {who: 'player'});
         });
 

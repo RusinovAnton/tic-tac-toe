@@ -167,7 +167,7 @@ export default class gameFieldController {
     isGameEnded() {
 
         // Draw when there is no way to win
-        if (!this.grid.isPossibleWin()) {
+        if (!this.grid.isWinnable()) {
             this.drawGame();
             return true;
         }
