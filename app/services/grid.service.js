@@ -15,7 +15,6 @@ export default class Grid {
         if (!isNumber(size) && !prevState) throw new Error('Size must be a number');
 
         return new Promise((resolve, reject) => {
-            console.log(this);
             try {
                 if (prevState === null) {
                     this.size = size;
@@ -34,10 +33,6 @@ export default class Grid {
             }
 
         });
-    }
-
-    isEmpty(cell) {
-        return cell.body === 'empty';
     }
 
     empty() {
@@ -69,6 +64,11 @@ export default class Grid {
         return cells;
     }
 
+    isEmpty(cell) {
+        if (cell === void 0) {throw new Error('Argument is undefined');}
+        return cell.body === 'empty';
+    }
+
     setCell(pos, body) {
 
         if (pos.x >= this.size || pos.y >= this.size) throw new Error('Unavaiable position');
@@ -78,6 +78,8 @@ export default class Grid {
         if (isUndefined(pos.x) && isUndefined(pos.y)) throw new Error('There is no coordinates in the pos obj');
 
         this.cells[pos.y][pos.x] = body;
+
+        console.log(this.cells);
 
         return true;
 
@@ -92,18 +94,19 @@ export default class Grid {
      *   e.g
      *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
      */
-    getAvaiableCells(lane, i) {
+    getAvaiableCells(lane) {
+
         let avaiableCells = [];
-        if (isArray(lane) && isNumber(i)) {
-            lane.forEach((_, j)=>{
-                if (this.isEmpty(cell)) {
-                    avaiableCells.push({x: j, y: i});
-                }
-            })
-        }
-        else {
-            this.cells.forEach((row, i)=> {
-                row.forEach((cell, j)=> {
+
+        if (isArray(lane)) {
+                lane.forEach((_, j)=>{
+                    if (this.isEmpty(cell)) {
+                        avaiableCells.push(cell.pos);
+                    }
+                })
+        } else {
+            this.cells.forEach((row)=> {
+                row.forEach((cell)=> {
                     if (this.isEmpty(cell)) avaiableCells.push(cell.pos);
                 })
             });

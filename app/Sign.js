@@ -20,7 +20,7 @@ class EnemySign extends Sign {
 
 class EmptySign extends Sign {
     constructor(pos) {
-        super('empty', 'empty', pos)
+        super('nobody', 'empty', pos)
     }
 }
 

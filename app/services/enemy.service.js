@@ -1,26 +1,30 @@
 import {some} from 'lodash';
 
 export default class Enemy {
-    constructor(grid) {
-        this.grid = grid;
+    constructor() {
+        this._grid = null;
         this.userMoves = [];
     }
 
-    move() {
-        var avaiableCell = this.grid.getAvaiableCells()[0];
+    set grid(grid) {
+        this._grid = grid;
+    }
 
-        let nextMove = this.predictUserMove() ||
+    move() {
+
+        var avaiableCell = this._grid.getAvaiableCells()[0];
+
+        let movePos = this.predictUserMove() ||
             this.possibleWinMove() ||
             {x: avaiableCell.x, y: avaiableCell.y};
 
-        setTimeout(()=> {
-            this.$scope.$apply(()=> {
-                this.grid.setCell(nextMove, new EnemySign(nextMove));
-                if (this.isGameEnded()) return;
-                this.playerMove = !this.playerMove;
-                this.saveState();
-            });
-        }, 500);
+        return new Promise((resolve, reject)=> {
+            // Setting timeout to mock enemys' thinking time
+            setTimeout(()=> {
+                resolve(movePos);
+            }, 500);
+        });
+
     }
 
     storeUserMove(pos) {
@@ -40,11 +44,11 @@ export default class Enemy {
         function checkVector(vector) {
             // Check if vector is valid. It can be -1, 0, 1
             return (vector.x >= -1 && vector.x <= 1) && (vector.y >= -1 && vector.y <= 1) &&
-                // Check if cell choosen by vector is in the scope of grid
+                // Check if cell choosen by vector is in the scope of _grid
                 (lastMove.x + vector.x >= 0 && lastMove.x + vector.x < _self.size) &&
                 (lastMove.y + vector.y >= 0 && lastMove.y + vector.y < _self.size) &&
                 // Check if cell is empty
-                (_self.grid.isEmpty(_self.grid.cells[lastMove.y + vector.y][lastMove.x + vector.x]))
+                (_self._grid.isEmpty(_self._grid.cells[lastMove.y + vector.y][lastMove.x + vector.x]))
         }
 
         if (this.userMoves.length >= 2) {
@@ -62,7 +66,7 @@ export default class Enemy {
 
     possibleWinMove() {
 
-        let possibleWinLanes = this.grid.getPossibleWinLanes().filter((lane)=>{
+        let possibleWinLanes = this._grid.getPossibleWinLanes().filter((lane)=>{
             return !some(lane, {who: 'player'});
         });
 

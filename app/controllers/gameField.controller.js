@@ -22,11 +22,12 @@ export default class gameFieldController {
 
         this.initStore();
 
+        this.enemy = new Enemy();
+
         this.setGridSize($routeParams.size, this.store.state);
 
+        this.gridLoaded = false;
         this.initGrid();
-
-        this.enemy = new Enemy(this.grid);
 
         this.startGame();
 
@@ -58,7 +59,8 @@ export default class gameFieldController {
     }
 
     initGrid() {
-        this.grid = new Grid();
+        this.grid = this.grid || new Grid();
+        this.enemy.grid = this.grid;
         this.grid.init(this.size, this.store.state)
             .then((succes) => {
                 if (succes) {
@@ -90,8 +92,20 @@ export default class gameFieldController {
 
         this.saveState();
 
-        this.enemy.move();
+        this.enemyMove();
 
+    }
+
+    enemyMove() {
+        this.enemy.move()
+            .then((pos)=>{
+                this.$scope.$apply(()=> {
+                    this.grid.setCell(pos, new EnemySign(pos));
+                    if (this.isGameEnded()) return;
+                    this.playerMove = !this.playerMove;
+                    this.saveState();
+                });
+            });
     }
 
     /**
