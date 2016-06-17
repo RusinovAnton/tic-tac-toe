@@ -1,4 +1,4 @@
-import gameNewController from '../controllers/gameNew.controller';
+import gameNewController from './gameNew.controller';
 
 let gameNewComponent = {
     templateUrl: 'templates/gameNew.template.html',

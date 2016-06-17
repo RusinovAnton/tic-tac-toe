@@ -1,11 +1,11 @@
 'use strict';
 
-import Grid from '../services/grid.service';
-import GameStorage from '../services/gameStorage.service';
-import Enemy from '../services/enemy.service';
-import {PlayerSign, EnemySign} from '../Sign';
+import Grid from '../../services/grid.service';
+import GameStorage from '../../services/gameStorage.service';
+import Enemy from '../../services/enemy.service';
+import {PlayerSign, EnemySign} from '../../Sign';
 
-import {randomInt} from '../utils/randomInt';
+import {randomInt} from '../../utils/randomInt';
 import {isUndefined, some} from 'lodash';
 
 export default class gameFieldController {
@@ -112,7 +112,7 @@ export default class gameFieldController {
     }
 
     /**
-     * Save game's state into localstorage
+     * Save game's state into localStorage
      */
     saveState() {
         this.store.state = {

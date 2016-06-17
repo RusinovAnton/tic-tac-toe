@@ -1,10 +1,10 @@
 import angular                  from 'angular';
 import ngRoute                  from 'angular-route';
 
-import gameNewComponent         from './components/gameNew.component';
-import gameInfoComponent        from './components/gameInfo.component';
-import gameFieldComponent       from './components/gameField.component';
-import fieldCellComponent       from './components/fieldCell.component';
+import gameNewComponent         from './components/gameNew/gameNew.component';
+import gameInfoComponent        from './components/gameInfo/gameInfo.component';
+import gameFieldComponent       from './components/gameField/gameField.component';
+import fieldCellComponent       from './components/fieldCell/fieldCell.component';
 
 angular
     .module('ticTacToe', [

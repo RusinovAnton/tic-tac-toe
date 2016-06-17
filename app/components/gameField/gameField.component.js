@@ -1,4 +1,4 @@
-import gameFieldController from '../controllers/gameField.controller';
+import gameFieldController from './gameField.controller';
 
 let gameFieldComponent = {
     templateUrl: 'templates/gameField.template.html',
