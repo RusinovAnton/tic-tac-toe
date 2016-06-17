@@ -1,5 +1,7 @@
 'use strict';
 
+import Grid from '../services/grid.service';
+
 import {
     some,
     max,
@@ -21,9 +23,7 @@ export default class Enemy {
 
         var avaiableCell = this._grid.getAvaiableCells()[0];
 
-        let movePos = this.predictUserMove() ||
-            this.possibleWinMove() ||
-            {x: avaiableCell.x, y: avaiableCell.y};
+        let movePos = this.possibleWinMove() || {x: avaiableCell.pos.x, y: avaiableCell.pos.y};
 
         return new Promise((resolve, reject)=> {
             // Setting timeout to mock enemys' thinking time
@@ -54,7 +54,7 @@ export default class Enemy {
                 // Check if cell choosen by vector is in the scope of _grid
                 (lastMove.x + vector.x >= 0 && lastMove.x + vector.x < _self._grid.size) && (lastMove.y + vector.y >= 0 && lastMove.y + vector.y < _self._grid.size) &&
                 // Check if cell is empty
-                (_self._grid.isEmpty(
+                (Grid.isEmpty(
                         _self._grid.getCell(
                             {
                                 x: lastMove.x + vector.x,
@@ -82,86 +82,60 @@ export default class Enemy {
 
         function getIntersections(userLanes, enemyLanes) {
 
-            let possibleWinMoves = [];
+            let possibleWinLanes = [];
 
             userLanes.forEach((lane)=> {
                 enemyLanes.forEach((enemyLane)=> {
-                    possibleWinMoves = possibleWinMoves.concat(intersectionWith(lane, enemyLane, isEqual));
+                    let intersections = intersectionWith(lane, enemyLane, isEqual);
+                    if (intersections.length) {
+                        intersections.forEach((cell)=>{
+                           cell.intersection = true;
+                        });
+                        possibleWinLanes.push(lane, enemyLane);
+                    }
                 });
             });
 
-            return possibleWinMoves;
+            return possibleWinLanes ;
         }
 
-        let winPos;
-        let enemyWin = this.getWinLanes('enemy');
-        let userWin = this.getWinLanes('player');
+        function getMaxRateLanes(lanes) {
 
-        if (enemyWin.lanes.length && userWin.lanes.length) {
+            let chancesArray = [];
 
-            winPos = getIntersections(userWin.lanes, enemyWin.lanes);
-            if (winPos.length) return winPos[0].pos;
-
-            if (userWin.rate > enemyWin.rate) {
-                winPos = this._grid.getAvaiableCells(userWin.lanes[0]);
-                return winPos[0];
-            } else {
-                winPos = this._grid.getAvaiableCells(enemyWin.lanes[0]);
-                return winPos[0];
-            }
-        }
-
-        let possibleMoves = [];
-
-        this._grid.getWinnableLanes('enemy').forEach((cell)=> {
-            if (this._grid.isEmpty(cell)) possibleMoves.push(cell);
-        });
-
-        if (possibleMoves.length) {
-            return possibleMoves[0].pos;
-        }
-
-        possibleMoves = [];
-
-        this._grid.getWinnableLanes('player').forEach((cell)=> {
-            if (this._grid.isEmpty(cell)) possibleMoves.push(cell);
-        });
-
-        if (possibleMoves.length) {
-            return possibleMoves[0].pos;
-        }
-
-        return false;
-
-    }
-
-    getWinLanes(who) {
-
-        let lanes = this._grid.getWinnableLanes(who);
-
-        let chancesArray = [];
-
-        lanes.forEach((lane)=> {
-
-            let emptyCells = lane.filter((lane)=> {
-                return lane.body === 'empty';
+            lanes.forEach((lane)=> {
+                chancesArray.push(Grid.getLaneWinChance(lane));
             });
 
-            chancesArray.push((1 / (emptyCells.length / lane.length)).toFixed(2));
+            let maximal = max(chancesArray);
 
+            let winLanes = [];
+
+            chancesArray.forEach((el, i)=> {
+                if (el == maximal) winLanes.push(lanes[i]);
+            });
+
+            return {
+                lanes: winLanes,
+                rate: maximal
+            };
+
+        }
+
+        // Take central cell if possible
+        let centerCell = this._grid.getCenter();
+        if (Grid.isEmpty(centerCell)) return centerCell.pos;
+
+        this._grid.forEachLane((lane)=>{
+            let winChance = Grid.getLaneWinChance(lane);
+            lane.forEach((cell)=>{
+
+                if(Grid.isEmpty(cell)) cell.winChance = cell.winChance > winChance ? cell.winChance : winChance;
+
+            })
         });
 
-        let maximal = max(chancesArray);
-        let winLanes = [];
-
-        chancesArray.forEach((el, i)=> {
-            if (el == maximal) winLanes.push(lanes[i]);
-        });
-
-        return {
-            lanes: winLanes,
-            rate: maximal
-        };
+        return false;
 
     }
 

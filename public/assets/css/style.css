@@ -8,8 +8,6 @@
     }
 }
 
-
-
 /* temp */
 .fa-times:before {
     content:'x';
@@ -82,6 +80,7 @@ main > .container {
 
 .field--cell {
     display: inline-block;
+    position: relative;
     font-size: 20px;
     width: 40px;
     height: 40px;
@@ -91,6 +90,18 @@ main > .container {
     box-shadow: 1px 1px 2px 0 rgba(0,0,0,0.4);
     overflow: hidden;
 }
+
+.field--cell .win-chance {
+    line-height: 40px;
+    font-size: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #666;
+}
+
 .field--cell .fa-times {
     color: #f00;
 }
@@ -192,3 +203,5 @@ input.ng-invalid {
 .text-right {
     text-align: right;
 }
+
+
