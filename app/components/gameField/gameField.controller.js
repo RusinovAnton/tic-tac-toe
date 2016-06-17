@@ -5,8 +5,11 @@ import GameStorage from '../../services/gameStorage.service';
 import Enemy from '../../services/enemy.service';
 import {PlayerSign, EnemySign} from '../../Sign';
 
-import {randomInt} from '../../utils/randomInt';
-import {isUndefined, some} from 'lodash';
+import {isUndefined} from 'lodash';
+
+function playersMove() {
+    return Math.random() >= 0.5;
+}
 
 export default class gameFieldController {
 
@@ -39,7 +42,7 @@ export default class gameFieldController {
             this.playerMove = this.store.state.playerMove;
             this.enemy.userMoves = this.store.state.moves || [];
         } else {
-            this.playerMove = true;
+            this.playerMove = playersMove();
             this.moves = [];
         }
     }
@@ -64,8 +67,8 @@ export default class gameFieldController {
         this.enemy.grid = this.grid;
 
         this.grid.init(this.size, this.store.state)
-            .then((succes) => {
-                if (succes) {
+            .then((success) => {
+                if (success) {
                     this.$scope.$apply(()=> {
                         this.gridLoaded = true;
                     });
@@ -78,14 +81,13 @@ export default class gameFieldController {
         // Do nothing if its not users' turn now
         if (!this.playerMove) return;
 
-        this.enemy.storeUserMove(pos);
-
         // Do nothing if game ended
         if (this.gameEnded) return;
 
         // Do nothing if choosen cell isn't empty already
         if (!this.grid.isEmpty(this.grid.getCell(pos))) return;
 
+        this.enemy.storeUserMove(pos);
         this.grid.setCell(pos, new PlayerSign(pos));
 
         if (this.isGameEnded()) return;
@@ -100,6 +102,7 @@ export default class gameFieldController {
     }
 
     enemyMove() {
+        // Get enemys' move position, then apply it for view
         this.enemy.move()
             .then((pos)=>{
                 this.$scope.$apply(()=> {
@@ -153,7 +156,7 @@ export default class gameFieldController {
 
         this.enemy.userMoves = [];
 
-        this.playerMove = true;
+        this.playerMove = playersMove();
         this.initGrid();
         this.startGame();
     }

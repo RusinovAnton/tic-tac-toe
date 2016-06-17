@@ -1,4 +1,11 @@
-import {some} from 'lodash';
+'use strict';
+
+import {
+    some,
+    max,
+    intersectionWith,
+    isEqual
+} from 'lodash';
 
 export default class Enemy {
     constructor() {
@@ -63,7 +70,6 @@ export default class Enemy {
                 x: lastMove.x - prevMove.x,
                 y: lastMove.y - prevMove.y
             };
-            console.log(isVector(vector));
             if (isVector(vector)) {
                 return {x: lastMove.x + vector.x, y: lastMove.y + vector.y}
             }
@@ -74,15 +80,89 @@ export default class Enemy {
 
     possibleWinMove() {
 
-        let possibleWinLanes = this._grid.getWinnableLanes().filter((lane)=> {
-            return !some(lane, {who: 'player'});
+        function getIntersections(userLanes, enemyLanes) {
+
+            let possibleWinMoves = [];
+
+            userLanes.forEach((lane)=> {
+                enemyLanes.forEach((enemyLane)=> {
+                    possibleWinMoves = possibleWinMoves.concat(intersectionWith(lane, enemyLane, isEqual));
+                });
+            });
+
+            return possibleWinMoves;
+        }
+
+        let winPos;
+        let enemyWin = this.getWinLanes('enemy');
+        let userWin = this.getWinLanes('player');
+
+        if (enemyWin.lanes.length && userWin.lanes.length) {
+
+            winPos = getIntersections(userWin.lanes, enemyWin.lanes);
+            if (winPos.length) return winPos[0].pos;
+
+            if (userWin.rate > enemyWin.rate) {
+                winPos = this._grid.getAvaiableCells(userWin.lanes[0]);
+                return winPos[0];
+            } else {
+                winPos = this._grid.getAvaiableCells(enemyWin.lanes[0]);
+                return winPos[0];
+            }
+        }
+
+        let possibleMoves = [];
+
+        this._grid.getWinnableLanes('enemy').forEach((cell)=> {
+            if (this._grid.isEmpty(cell)) possibleMoves.push(cell);
         });
 
+        if (possibleMoves.length) {
+            return possibleMoves[0].pos;
+        }
 
-        if (!possibleWinLanes.length) {
-            return false;
+        possibleMoves = [];
+
+        this._grid.getWinnableLanes('player').forEach((cell)=> {
+            if (this._grid.isEmpty(cell)) possibleMoves.push(cell);
+        });
+
+        if (possibleMoves.length) {
+            return possibleMoves[0].pos;
         }
 
         return false;
+
     }
+
+    getWinLanes(who) {
+
+        let lanes = this._grid.getWinnableLanes(who);
+
+        let chancesArray = [];
+
+        lanes.forEach((lane)=> {
+
+            let emptyCells = lane.filter((lane)=> {
+                return lane.body === 'empty';
+            });
+
+            chancesArray.push((1 / (emptyCells.length / lane.length)).toFixed(2));
+
+        });
+
+        let maximal = max(chancesArray);
+        let winLanes = [];
+
+        chancesArray.forEach((el, i)=> {
+            if (el == maximal) winLanes.push(lanes[i]);
+        });
+
+        return {
+            lanes: winLanes,
+            rate: maximal
+        };
+
+    }
+
 }

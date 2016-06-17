@@ -2,12 +2,20 @@
 
 import {EmptySign} from '../Sign';
 
-import {every, some, cloneDeep, isNumber, isArray, isObject, isUndefined} from 'lodash';
+import {
+    every,
+    some,
+    cloneDeep,
+    isNumber,
+    isArray,
+    isObject,
+    isUndefined
+} from 'lodash';
 
 export default class Grid {
 
     constructor() {
-        this.gridInited = false;
+        this.gridInit = false;
     }
 
     init(size, prevState) {
@@ -16,6 +24,7 @@ export default class Grid {
 
         return new Promise((resolve, reject) => {
             try {
+
                 if (prevState === null || isUndefined(prevState)) {
                     this.size = size;
                     this.cells = this.empty(this.size);
@@ -25,8 +34,8 @@ export default class Grid {
                     this.cells = this.fromState();
                 }
 
-                this.gridInited = true;
-                resolve(true);
+                this.gridInit = true;
+                resolve(this.gridInit);
 
             } catch (err) {
                 reject(err);
@@ -99,7 +108,7 @@ export default class Grid {
         let avaiableCells = [];
 
         if (isArray(lane)) {
-            lane.forEach((_, j)=> {
+            lane.forEach((cell)=> {
                 if (this.isEmpty(cell)) {
                     avaiableCells.push(cell.pos);
                 }
@@ -111,6 +120,7 @@ export default class Grid {
                 })
             });
         }
+
         return avaiableCells;
     }
 
@@ -173,7 +183,7 @@ export default class Grid {
         return col;
     }
 
-    getDiagonal(index) {
+    getDiagonals(index) {
         return [
             this.getFirstDiagonal(),
             this.getSecondDiagonal()
@@ -187,7 +197,7 @@ export default class Grid {
      */
     forEachDiagonal(cb) {
         for (var i = 0; i < 2; i++) {
-            cb(this.getDiagonal(i), i, 'diagonal');
+            cb(this.getDiagonals(i), i, 'diagonal');
         }
     }
 
@@ -235,7 +245,7 @@ export default class Grid {
 
         let doneState;
 
-        this.forEachLane((lane, i, type) => {
+        this.forEachLane((lane) => {
             if (every(lane, {who: 'player'})) {
                 doneState = {
                     who: 'player',
@@ -252,8 +262,13 @@ export default class Grid {
         return doneState || false;
     }
 
-    isLaneWinnableBy(who) {
-        let opposite = who === 'player' ? 'enemy' : 'player';
+    isLaneWinnableBy(who, lane) {
+
+        who = who || 'player';
+        let opposite = who === 'player' ?
+            'enemy' :
+            'player';
+
         return (some(lane, {who: who}) && !some(lane, {who: opposite})) ||
             every(lane, {body: 'empty'});
 
@@ -263,12 +278,13 @@ export default class Grid {
         return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
     }
 
+
     getWinnableLanes(who) {
 
         let possibleWinLanes = [];
 
-        this.forEachLane((lane, index)=> {
-            if (!isUndefined(who) && !isLaneWinnableBy(who)) {
+        this.forEachLane((lane)=> {
+            if (!isUndefined(who) && !this.isLaneWinnableBy(who, lane)) {
                 return;
             } else if (!this.isLaneWinnable(lane)) {
                 return;
@@ -280,7 +296,7 @@ export default class Grid {
     }
 
     /**
-     * returns true if there are lanes in array possible
+     * returns true if there are winnable lanes
      *
      * @returns {boolean}
      */
