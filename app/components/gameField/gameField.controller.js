@@ -171,6 +171,7 @@ export default class gameFieldController {
     isGameEnded() {
 
         // Draw when there is no way to win
+        // TODO: cache winnable lanes for user/enemy turns' cycle step
         if (!this.grid.isWinnable()) {
             this.drawGame();
             return true;

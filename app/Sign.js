@@ -3,6 +3,7 @@ class Sign {
         this.who = who;
         this.body = body;
         this.pos = pos;
+        this.winChance = null;
     }
 }
 

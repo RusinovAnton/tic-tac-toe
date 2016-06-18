@@ -3,8 +3,8 @@
 import {assert, expect} from 'chai';
 import {isArray} from 'lodash';
 
-import Grid from '../app/services/grid.service';
-import {PlayerSign, EnemySign} from '../app/Sign';
+import Grid from '../../app/services/grid.service';
+import {PlayerSign, EnemySign} from '../../app/Sign';
 
 let mockGrid = new Grid();
 
@@ -102,10 +102,10 @@ describe('Grid()', ()=> {
                 .then((success)=> {
                     if (success) {
                         try {
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[0][2]), false);
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[1][1]), false);
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[2][0]), false);
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[0][0]), true);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[0][2]), false);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[1][1]), false);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[2][0]), false);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[0][0]), true);
                             done();
                         } catch (err) {
                             done(err);
@@ -129,9 +129,9 @@ describe('Grid()', ()=> {
                         mockGrid.cells[0][1] = new EnemySign();
                         mockGrid.cells[0][2] = new PlayerSign();
                         try {
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[0][1]), false);
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[0][2]), false);
-                            assert.equal(mockGrid.isEmpty(mockGrid.cells[1][2]), true);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[0][1]), false);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[0][2]), false);
+                            assert.equal(Grid.isEmpty(mockGrid.cells[1][2]), true);
                             done()
                         } catch (err) {
                             done(err);

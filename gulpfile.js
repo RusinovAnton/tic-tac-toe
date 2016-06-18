@@ -41,7 +41,6 @@ gulp.task('test', function(){
             .pipe(mocha(config.mocha));
     }
     gutil.log(gutil.colors.red("Skipping test task"));
-    return;
 });
 
 gulp.task('watch', ['test', 'app'], function () {

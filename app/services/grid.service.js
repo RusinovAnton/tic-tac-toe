@@ -2,14 +2,15 @@
 
 import {EmptySign} from '../Sign';
 
+import isUndefined from '../utils/isUndefined';
+
 import {
     every,
     some,
     cloneDeep,
     isNumber,
     isArray,
-    isObject,
-    isUndefined
+    isObject
 } from 'lodash';
 
 export default class Grid {
@@ -128,9 +129,8 @@ export default class Grid {
     }
 
     /**
-     *   Returns array of objects with coordinates of avaiable cells
-     *   e.g
-     *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
+     *  @param lane {Array} pass flat array lane to find empty cells in it (optional)
+     *  @returns {Array} of empty cells
      */
     getAvaiableCells(lane) {
 
@@ -154,7 +154,7 @@ export default class Grid {
     }
 
     /**
-     * True if there is avaiable cells
+     * True if there are cells avaiable
      *
      * @returns {boolean}
      */
@@ -203,6 +203,7 @@ export default class Grid {
     }
 
     getColumn(index) {
+
         let col = [];
         // Iterates throw each grids' row and compose column array
         this.forEachRow((row)=> {
@@ -213,8 +214,10 @@ export default class Grid {
     }
 
     getCenter(){
+
         if (this.size % 2 === 0) return false;
         return this.cells[(this.size-1)/2][(this.size-1)/2];
+
     }
 
     /**
@@ -269,7 +272,7 @@ export default class Grid {
     /**
      * Checks if there are lanes with all players' or all enemy's signs in it
      *
-     * @returns {bool} true if there are a winning lane
+     * @returns {bool} true if there is a winning lane
      */
     isDone() {
 
@@ -306,6 +309,22 @@ export default class Grid {
         });
 
         return possibleWinLanes;
+    }
+
+    getUnwinnableLanes() {
+
+        let impossibleWinLanes = [];
+
+        this.forEachLane((lane)=> {
+
+            if (!Grid.isLaneWinnable(lane)) {
+                impossibleWinLanes.push(lane);
+            }
+
+        });
+
+        return impossibleWinLanes;
+
     }
 
     /**
