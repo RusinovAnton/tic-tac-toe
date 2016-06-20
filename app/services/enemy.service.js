@@ -7,6 +7,7 @@ import allMaxBy from '../utils/allMaxBy.util';
 import {
     some,
     max,
+    maxBy,
     flatten,
     intersection
 } from 'lodash';
@@ -59,29 +60,35 @@ export default class Enemy {
         let centerCell = this._grid.getCenter();
         if (Grid.isEmpty(centerCell)) return centerCell.pos;
 
-        this.setChances();
+        this.setCellChances();
 
         let maxChanceCells = this.getMaxChanceCells();
 
         if (!maxChanceCells || !maxChanceCells.length) return false;
         else if (maxChanceCells.length === 1) return maxChanceCells[0].pos;
+        else {
+          console.log(maxBy(maxChanceCells, 'winChance')['winChance']);
+        }
+    }
+
+    getWinLanesIntersections(){
 
     }
 
-    setChances() {
+    setCellChances() {
 
-        let winnableLanes = this._grid.getWinnableLanes();
-        let unwinnableLanes = this._grid.getUnwinnableLanes();
-        let intersectedLanes = intersection(winnableLanes, unwinnableLanes);
+        // Clear winChances
+        this._grid.cells.forEach((lane)=>{
+            lane.forEach((cell)=>{
+                cell.winChance = null;
+            });
+        });
 
-        winnableLanes.forEach((lane)=>{
+        this._grid.getWinnableLanes().forEach((lane)=>{
 
             let winChance = Grid.getLaneWinChance(lane);
-
             lane.forEach((cell)=> {
-
                 if (Grid.isEmpty(cell)) cell.winChance = cell.winChance > winChance ? cell.winChance : winChance;
-
             });
 
         });

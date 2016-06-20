@@ -107,7 +107,7 @@ export default class Grid {
             if (Grid.isEmpty(cell)) emptyCells++;
         });
 
-        return (1 / (emptyCells / lane.length)).toFixed(2);
+        return (lane.length / emptyCells) / lane.length;
     }
 
     setCell(pos, body) {
