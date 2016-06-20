@@ -5,18 +5,66 @@ import {EmptySign} from '../Sign';
 import isUndefined from '../utils/isUndefined';
 
 import {
+    flatten,
     every,
     some,
     cloneDeep,
     isNumber,
+    isEqual,
     isArray,
-    isObject
+    isObject,
+    intersectionWith
 } from 'lodash';
 
 export default class Grid {
 
     constructor() {
         this.gridInit = false;
+    }
+
+    static getLanesIntersections(array1, array2) {
+        if (!(isArray(array1) && isArray(array2))) throw new Error('Arguments must be lanes arrays');
+
+        array1 = flatten(array1);
+        array2 = flatten(array2);
+
+        return intersectionWith(array1, array2, isEqual);
+    }
+
+    static isLaneWinnableBy(who, lane) {
+
+        who = who || 'player';
+        let opposite = who === 'player' ?
+            'enemy' :
+            'player';
+
+        return (some(lane, {who: who}) && !some(lane, {who: opposite})) ||
+            every(lane, {body: 'empty'});
+
+    }
+
+    static isLaneWinnable(lane) {
+        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
+    }
+
+    static isEmpty(cell) {
+        if (cell === void 0) {
+            throw new Error('Argument is undefined');
+        }
+        return cell.body === 'empty';
+    }
+
+    static getLaneWinChance(lane) {
+
+        if (!Grid.isLaneWinnable(lane)) return 0; // lane is unwinnable
+
+        let emptyCells = 0;
+
+        lane.forEach((cell)=> {
+            if (Grid.isEmpty(cell)) emptyCells++;
+        });
+
+        return (lane.length / emptyCells) / lane.length;
     }
 
     init(size, prevState) {
@@ -72,42 +120,6 @@ export default class Grid {
         }
 
         return cells;
-    }
-
-    static isLaneWinnableBy(who, lane) {
-
-        who = who || 'player';
-        let opposite = who === 'player' ?
-            'enemy' :
-            'player';
-
-        return (some(lane, {who: who}) && !some(lane, {who: opposite})) ||
-            every(lane, {body: 'empty'});
-
-    }
-
-    static isLaneWinnable(lane) {
-        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
-    }
-
-    static isEmpty(cell) {
-        if (cell === void 0) {
-            throw new Error('Argument is undefined');
-        }
-        return cell.body === 'empty';
-    }
-
-    static getLaneWinChance(lane) {
-
-        if (!Grid.isLaneWinnable(lane)) return 0; // lane is unwinnable
-
-        let emptyCells = 0;
-
-        lane.forEach((cell)=> {
-            if (Grid.isEmpty(cell)) emptyCells++;
-        });
-
-        return (lane.length / emptyCells) / lane.length;
     }
 
     setCell(pos, body) {
@@ -308,7 +320,10 @@ export default class Grid {
             possibleWinLanes.push(lane);
         });
 
-        return possibleWinLanes;
+        if (possibleWinLanes.length) {
+            return possibleWinLanes
+        }
+
     }
 
     getUnwinnableLanes() {
@@ -333,7 +348,7 @@ export default class Grid {
      * @returns {boolean}
      */
     isWinnable() {
-        return this.getWinnableLanes().length !== 0;
+        return this.getWinnableLanes() !== void 0;
     }
 
 }
