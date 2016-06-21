@@ -14,7 +14,8 @@ const config = {
         dest: './public/assets/js/'
     },
     webpack: {
-        config: './webpack.config.js'
+        config: './webpack.config.js',
+        prodconfig: './webpack-prod.config.js'
     },
     test: {
         src: './tests/**/*.test.js'
@@ -27,10 +28,12 @@ const config = {
     }
 };
 
+const webpackConfig = argv.prod ? require(config.webpack.prodconfig) : require(config.webpack.config);
+
 gulp.task('app', ['test'], function () {
     return gulp.src(config.app.src)
         .pipe(plumber())
-        .pipe(webpack(require(config.webpack.config)))
+        .pipe(webpack(webpackConfig))
         .pipe(gulp.dest(config.app.dest));
 });
 
