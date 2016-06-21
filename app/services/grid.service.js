@@ -1,6 +1,7 @@
 'use strict';
 
-import {EmptySign} from '../Sign';
+import Grid from '../base/Grid';
+import {EmptySign} from '../base/Sign';
 
 import isUndefined from '../utils/isUndefined';
 
@@ -10,96 +11,14 @@ import {
     some,
     cloneDeep,
     isNumber,
-    isEqual,
     isArray,
-    isObject,
-    intersectionWith
+    isObject
 } from 'lodash';
 
-export default class Grid {
+export default class TicTacToeGrid extends Grid {
 
     constructor() {
-        this.gridInit = false;
-    }
-
-    /**
-     * Returns array of cells that happen in both given lane arrays
-     * @param array1
-     * @param array2
-     * @returns {Array}
-     */
-    static getLanesIntersections(array1, array2) {
-
-        if (!(isArray(array1) && isArray(array2))) {
-            return void 0;
-        }
-
-        array1 = flatten(array1);
-        array2 = flatten(array2);
-
-        let intersections = intersectionWith(array1, array2, isEqual);
-
-        return intersections.length ? intersections : void 0;
-    }
-
-    /**
-     * Returns if lane is winnable by player or enemy
-     * @param who {String} - 'player' or 'enemy' (default 'player')
-     * @param lane
-     * @returns {boolean}
-     */
-    static isLaneWinnableBy(who, lane) {
-
-        who = who || 'player';
-        let opposite = who === 'player' ?
-            'enemy' :
-            'player';
-
-        // Every lane is empty or lane has some signs of same kind
-        return every(lane, {body: 'empty'}) ||
-            (some(lane, {who: who}) && !some(lane, {who: opposite}));
-
-    }
-
-    /**
-     *
-     * @param lane
-     * @returns {boolean}
-     */
-    static isLaneWinnable(lane) {
-        // Lane is empty or have signs of same kind
-        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
-    }
-
-    /**
-     * Returns true if cell is empty
-     * @param cell {Object}
-     * @returns {boolean}
-     */
-    static isEmpty(cell) {
-        if (cell === void 0) {
-            throw new Error('Argument is undefined');
-        }
-        return cell.body === 'empty';
-    }
-
-    /**
-     * Returns winChance for given lane
-     * @param lane {Array}
-     * @returns {Number}
-     */
-    static getLaneWinChance(lane) {
-
-        if (!Grid.isLaneWinnable(lane)) return 0; // lane is unwinnable
-
-        let emptyCells = 0;
-
-        // Count lanes' empty cells
-        lane.forEach((cell)=> {
-            if (Grid.isEmpty(cell)) emptyCells++;
-        });
-
-        return (lane.length / emptyCells) / lane.length;
+        super();
     }
 
     /**
@@ -173,6 +92,66 @@ export default class Grid {
     }
 
     /**
+     * Returns if lane is winnable by player or enemy
+     * @param who {String} - 'player' or 'enemy' (default 'player')
+     * @param lane
+     * @returns {boolean}
+     */
+    static isLaneWinnableBy(who, lane) {
+
+        who = who || 'player';
+        let opposite = who === 'player' ?
+            'enemy' :
+            'player';
+
+        // Every lane is empty or lane has some signs of same kind
+        return every(lane, {body: 'empty'}) ||
+            (some(lane, {who: who}) && !some(lane, {who: opposite}));
+
+    }
+
+    /**
+     *
+     * @param lane
+     * @returns {boolean}
+     */
+    static isLaneWinnable(lane) {
+        // Lane is empty or have signs of same kind
+        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
+    }
+
+    /**
+     * Returns true if cell is empty
+     * @param cell {Object}
+     * @returns {boolean}
+     */
+    static isEmpty(cell) {
+        if (cell === void 0) {
+            throw new Error('Argument is undefined');
+        }
+        return cell.body === 'empty';
+    }
+
+    /**
+     * Returns winChance for given lane
+     * @param lane {Array}
+     * @returns {Number}
+     */
+    static getLaneWinChance(lane) {
+
+        if (!TicTacToeGrid.isLaneWinnable(lane)) return 0; // lane is unwinnable
+
+        let emptyCells = 0;
+
+        // Count lanes' empty cells
+        lane.forEach((cell)=> {
+            if (TicTacToeGrid.isEmpty(cell)) emptyCells++;
+        });
+
+        return (lane.length / emptyCells) / lane.length;
+    }
+
+    /**
      * Sets body for needed cells'
      * @param pos
      * @param body
@@ -193,15 +172,6 @@ export default class Grid {
     }
 
     /**
-     * Returns' cell by position
-     * @param pos {Object} position object {x:, y:}
-     * @returns {*}
-     */
-    getCell(pos) {
-        return this.cells[pos.y][pos.x];
-    }
-
-    /**
      *  @param lane {Array} (optional) lane array or array of lane arrays to find empty cells in it
      *  @returns {Array} of initEmpty cells
      */
@@ -212,149 +182,19 @@ export default class Grid {
         if (isArray(lane)) {
             lane = flatten(lane);
             lane.forEach((cell)=> {
-                if (Grid.isEmpty(cell)) {
+                if (TicTacToeGrid.isEmpty(cell)) {
                     avaiableCells.push(cell);
                 }
             })
         } else {
             this.cells.forEach((row)=> {
                 row.forEach((cell)=> {
-                    if (Grid.isEmpty(cell)) avaiableCells.push(cell);
+                    if (TicTacToeGrid.isEmpty(cell)) avaiableCells.push(cell);
                 })
             });
         }
 
         return avaiableCells;
-    }
-
-    /**
-     * True if there are cells avaiable
-     *
-     * @returns {boolean}
-     */
-    cellsAvaiable() {
-        return this.getAvaiableCells().length !== 0;
-    }
-
-    /**
-     * [x, ., .]
-     * [., x, .]
-     * [., ., x]
-     *
-     * @returns {Array} Array with elements from first diagonal
-     */
-    getFirstDiagonal() {
-        let diagonal = [];
-
-        let i = 0;
-        for (i; i < this.size; i++) {
-            diagonal.push(this.cells[i][i]);
-        }
-        return diagonal;
-    }
-
-    /**
-     * [., ., x]
-     * [., x, .]
-     * [x, ., .]
-     *
-     * @returns {Array} Array with elements from second diagonal
-     */
-    getSecondDiagonal() {
-        let diagonal = [];
-        let i = 0;
-        let j = this.size - 1;
-        while (i < this.size) {
-            diagonal.push(this.cells[i][j]);
-            i++;
-            j--;
-        }
-        return diagonal;
-    }
-
-    /**
-     * Returns needed row from grid by its' index
-     * @param index {Number}
-     * @returns {Array}
-     */
-    getRow(index) {
-        return this.cells[index];
-    }
-
-    /**
-     * Returns' needed column from grid by its' index
-     * @param index
-     * @returns {Array}
-     */
-    getColumn(index) {
-
-        let col = [];
-        // Iterates throw each grids' row and compose column array
-        this.forEachRow((row)=> {
-            col.push(row[index]);
-        });
-
-        return col;
-    }
-
-    /**
-     * Returns' central cell or false if impossible
-     * @returns {Object || undefined}
-     */
-    getCenter() {
-
-        if (this.size % 2 === 0) return void 0;
-        return this.cells[(this.size - 1) / 2][(this.size - 1) / 2];
-
-    }
-
-    /**
-     * Iterates over both diagonales and applies given callback
-     *
-     * @param {Function} cb(lane, index, laneType)
-     */
-    forEachDiagonal(cb) {
-        for (var i = 0; i < 2; i++) {
-            cb([
-                this.getFirstDiagonal(),
-                this.getSecondDiagonal()
-            ][i], i, 'diagonal');
-        }
-    }
-
-    /**
-     * Iterates throw all grids' rows and applies given callback
-     *
-     * @param {Function} cb(lane, index, laneType)
-     */
-    forEachRow(cb) {
-        let i = 0;
-        for (i; i < this.size; i++) {
-            cb(this.getRow(i), i, 'row');
-        }
-    }
-
-    /**
-     * Iterates throw all grids' columns and applies given callback
-     *
-     * @param {Function} cb(lane, index, laneType)
-     */
-    forEachColumn(cb) {
-        let i = 0;
-        for (i; i < this.size; i++) {
-            cb(this.getColumn(i), i, 'column');
-        }
-    }
-
-    /**
-     * Iterates over each lane in grid applying provided callback function
-     *
-     * @param {Function} cb(lane, index, laneType)
-     */
-    forEachLane(cb) {
-        this.forEachDiagonal(cb);
-        this.forEachRow(cb);
-        this.forEachColumn(cb);
     }
 
     /**
@@ -393,18 +233,17 @@ export default class Grid {
         let possibleWinLanes = [];
         if (!isUndefined(who)) {
             this.forEachLane((lane)=> {
-                if (Grid.isLaneWinnableBy(who, lane)) {
+                if (TicTacToeGrid.isLaneWinnableBy(who, lane)) {
                     possibleWinLanes.push(lane);
                 }
             });
         } else {
             this.forEachLane((lane)=> {
-                if (Grid.isLaneWinnable(lane)) {
+                if (TicTacToeGrid.isLaneWinnable(lane)) {
                     possibleWinLanes.push(lane);
                 }
             });
         }
-
         if (possibleWinLanes.length) {
             return possibleWinLanes
         }
@@ -420,7 +259,7 @@ export default class Grid {
 
         this.forEachLane((lane)=> {
 
-            if (!Grid.isLaneWinnable(lane)) {
+            if (!TicTacToeGrid.isLaneWinnable(lane)) {
                 impossibleWinLanes.push(lane);
             }
 

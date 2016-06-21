@@ -61,27 +61,25 @@
 	
 	var _angularRoute2 = _interopRequireDefault(_angularRoute);
 	
-	var _gameNew = __webpack_require__(6);
+	var _start = __webpack_require__(6);
 	
-	var _gameNew2 = _interopRequireDefault(_gameNew);
+	var _start2 = _interopRequireDefault(_start);
 	
-	var _gameInfo = __webpack_require__(8);
+	var _field = __webpack_require__(9);
 	
-	var _gameInfo2 = _interopRequireDefault(_gameInfo);
+	var _field2 = _interopRequireDefault(_field);
 	
-	var _gameField = __webpack_require__(9);
+	var _info = __webpack_require__(22);
 	
-	var _gameField2 = _interopRequireDefault(_gameField);
+	var _info2 = _interopRequireDefault(_info);
 	
-	var _fieldCell = __webpack_require__(20);
+	var _cell = __webpack_require__(24);
 	
-	var _fieldCell2 = _interopRequireDefault(_fieldCell);
+	var _cell2 = _interopRequireDefault(_cell);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field']);
-	
-	_angular2.default.module('ticTacToe').config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
+	_angular2.default.module('ticTacToe', ['ngRoute', 'start', 'field']).config(['$locationProvider', '$routeProvider', function ($locationProvider, $routeProvider) {
 	    $locationProvider.hashPrefix('!');
 	    $routeProvider.when('/new', {
 	        template: '<game-new></game-new>'
@@ -89,14 +87,6 @@
 	        template: '<game-field></game-field>'
 	    }).otherwise('/new');
 	}]);
-	
-	_angular2.default.module('start', []).component('gameNew', _gameNew2.default);
-	
-	_angular2.default.module('field', ['info', 'cell']).component('gameField', _gameField2.default);
-	
-	_angular2.default.module('info', []).component('gameInfo', _gameInfo2.default);
-	
-	_angular2.default.module('cell', []).component('fieldCell', _fieldCell2.default);
 
 /***/ },
 /* 2 */
@@ -32190,7 +32180,31 @@
 	    value: true
 	});
 	
+	var _angular = __webpack_require__(2);
+	
+	var _angular2 = _interopRequireDefault(_angular);
+	
 	var _gameNew = __webpack_require__(7);
+	
+	var _gameNew2 = _interopRequireDefault(_gameNew);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	_angular2.default.module('start', []).component('gameNew', _gameNew2.default);
+	
+	exports.default = _angular2.default.module('start');
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _gameNew = __webpack_require__(8);
 	
 	var _gameNew2 = _interopRequireDefault(_gameNew);
 	
@@ -32204,7 +32218,7 @@
 	exports.default = gameNewComponent;
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32226,28 +32240,6 @@
 	exports.default = gameNewController;
 
 /***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	var gameInfoComponent = {
-	    templateUrl: 'templates/gameInfo.template.html',
-	    bindings: {
-	        gameEnded: '<',
-	        gameStatus: '<',
-	        playerMove: '<',
-	        playerSign: '<',
-	        enemySign: '<'
-	    }
-	};
-	
-	exports.default = gameInfoComponent;
-
-/***/ },
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -32257,7 +32249,31 @@
 	    value: true
 	});
 	
+	var _angular = __webpack_require__(2);
+	
+	var _angular2 = _interopRequireDefault(_angular);
+	
 	var _gameField = __webpack_require__(10);
+	
+	var _gameField2 = _interopRequireDefault(_gameField);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	_angular2.default.module('field', ['info', 'cell']).component('gameField', _gameField2.default);
+	
+	exports.default = _angular2.default.module('field');
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _gameField = __webpack_require__(11);
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
@@ -32271,7 +32287,7 @@
 	exports.default = gameFieldComponent;
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32282,19 +32298,19 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _grid = __webpack_require__(11);
+	var _grid = __webpack_require__(12);
 	
 	var _grid2 = _interopRequireDefault(_grid);
 	
-	var _gameStorage = __webpack_require__(16);
+	var _gameStorage = __webpack_require__(18);
 	
 	var _gameStorage2 = _interopRequireDefault(_gameStorage);
 	
-	var _enemy = __webpack_require__(17);
+	var _enemy = __webpack_require__(19);
 	
 	var _enemy2 = _interopRequireDefault(_enemy);
 	
-	var _Sign = __webpack_require__(12);
+	var _Sign = __webpack_require__(16);
 	
 	var _lodash = __webpack_require__(14);
 	
@@ -32508,7 +32524,7 @@
 	exports.default = gameFieldController;
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -32519,9 +32535,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Sign = __webpack_require__(12);
+	var _Grid2 = __webpack_require__(13);
 	
-	var _isUndefined = __webpack_require__(13);
+	var _Grid3 = _interopRequireDefault(_Grid2);
+	
+	var _Sign = __webpack_require__(16);
+	
+	var _isUndefined = __webpack_require__(17);
 	
 	var _isUndefined2 = _interopRequireDefault(_isUndefined);
 	
@@ -32531,33 +32551,31 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Grid = function () {
-	    function Grid() {
-	        _classCallCheck(this, Grid);
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	        this.gridInit = false;
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var TicTacToeGrid = function (_Grid) {
+	    _inherits(TicTacToeGrid, _Grid);
+	
+	    function TicTacToeGrid() {
+	        _classCallCheck(this, TicTacToeGrid);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(TicTacToeGrid).call(this));
 	    }
 	
 	    /**
-	     * Returns array of cells that happen in both given lane arrays
-	     * @param array1
-	     * @param array2
-	     * @returns {Array}
+	     * Initialize cells' array with given size or from previous state if given
+	     * @param size
+	     * @param prevState
+	     * @returns {Promise}
 	     */
 	
 	
-	    _createClass(Grid, [{
+	    _createClass(TicTacToeGrid, [{
 	        key: 'init',
-	
-	
-	        /**
-	         * Initialize cells' array with given size or from previous state if given
-	         * @param size
-	         * @param prevState
-	         * @returns {Promise}
-	         */
 	        value: function init(size, prevState) {
-	            var _this = this;
+	            var _this2 = this;
 	
 	            if (!(0, _lodash.isNumber)(size) && !prevState) throw new Error('Size must be a number');
 	
@@ -32565,17 +32583,17 @@
 	                try {
 	
 	                    if (!prevState) {
-	                        _this.size = size;
-	                        _this.cells = _this.initEmpty(_this.size);
+	                        _this2.size = size;
+	                        _this2.cells = _this2.initEmpty(_this2.size);
 	                    } else {
-	                        _this.size = prevState.size;
-	                        _this.prevState = prevState;
-	                        _this.cells = _this.initFromState();
+	                        _this2.size = prevState.size;
+	                        _this2.prevState = prevState;
+	                        _this2.cells = _this2.initFromState();
 	                    }
 	
-	                    _this.gridInit = true;
+	                    _this2.gridInit = true;
 	                    // Return success if grid was initialized
-	                    resolve(_this.gridInit);
+	                    resolve(_this2.gridInit);
 	                } catch (err) {
 	                    reject(err);
 	                }
@@ -32626,14 +32644,22 @@
 	        }
 	
 	        /**
+	         * Returns if lane is winnable by player or enemy
+	         * @param who {String} - 'player' or 'enemy' (default 'player')
+	         * @param lane
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'setCell',
+	
+	
+	        /**
 	         * Sets body for needed cells'
 	         * @param pos
 	         * @param body
 	         * @returns {boolean} true if set
 	         */
-	
-	    }, {
-	        key: 'setCell',
 	        value: function setCell(pos, body) {
 	
 	            if (pos.x >= this.size || pos.y >= this.size) throw new Error('Unavaiable position');
@@ -32648,6 +32674,273 @@
 	        }
 	
 	        /**
+	         *  @param lane {Array} (optional) lane array or array of lane arrays to find empty cells in it
+	         *  @returns {Array} of initEmpty cells
+	         */
+	
+	    }, {
+	        key: 'getAvaiableCells',
+	        value: function getAvaiableCells(lane) {
+	
+	            var avaiableCells = [];
+	
+	            if ((0, _lodash.isArray)(lane)) {
+	                lane = (0, _lodash.flatten)(lane);
+	                lane.forEach(function (cell) {
+	                    if (TicTacToeGrid.isEmpty(cell)) {
+	                        avaiableCells.push(cell);
+	                    }
+	                });
+	            } else {
+	                this.cells.forEach(function (row) {
+	                    row.forEach(function (cell) {
+	                        if (TicTacToeGrid.isEmpty(cell)) avaiableCells.push(cell);
+	                    });
+	                });
+	            }
+	
+	            return avaiableCells;
+	        }
+	
+	        /**
+	         * Checks if there are lanes with all players' or all enemy's signs in it
+	         *
+	         * @returns {bool} true if there is a winning lane
+	         */
+	
+	    }, {
+	        key: 'isDone',
+	        value: function isDone() {
+	
+	            var doneState = void 0;
+	
+	            this.forEachLane(function (lane) {
+	                if ((0, _lodash.every)(lane, { who: 'player' })) {
+	                    doneState = {
+	                        who: 'player',
+	                        lane: lane
+	                    };
+	                } else if ((0, _lodash.every)(lane, { who: 'enemy' })) {
+	                    doneState = {
+	                        who: 'enemy',
+	                        lane: lane
+	                    };
+	                }
+	            });
+	
+	            return doneState || false;
+	        }
+	
+	        /**
+	         * returns array of lanes which is possible to win
+	         * @param who {String} - 'player' || 'enemy' (optional) - get winnable lane by player or enemy only
+	         * @returns {Array}
+	         */
+	
+	    }, {
+	        key: 'getWinnableLanes',
+	        value: function getWinnableLanes(who) {
+	
+	            var possibleWinLanes = [];
+	            if (!(0, _isUndefined2.default)(who)) {
+	                this.forEachLane(function (lane) {
+	                    if (TicTacToeGrid.isLaneWinnableBy(who, lane)) {
+	                        possibleWinLanes.push(lane);
+	                    }
+	                });
+	            } else {
+	                this.forEachLane(function (lane) {
+	                    if (TicTacToeGrid.isLaneWinnable(lane)) {
+	                        possibleWinLanes.push(lane);
+	                    }
+	                });
+	            }
+	            if (possibleWinLanes.length) {
+	                return possibleWinLanes;
+	            }
+	        }
+	
+	        /**
+	         * returns array of lanes which is possible to win
+	         * @returns {Array}
+	         */
+	
+	    }, {
+	        key: 'getUnwinnableLanes',
+	        value: function getUnwinnableLanes() {
+	
+	            var impossibleWinLanes = [];
+	
+	            this.forEachLane(function (lane) {
+	
+	                if (!TicTacToeGrid.isLaneWinnable(lane)) {
+	                    impossibleWinLanes.push(lane);
+	                }
+	            });
+	
+	            return impossibleWinLanes;
+	        }
+	
+	        /**
+	         * returns true if there are winnable lanes
+	         *
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isWinnable',
+	        value: function isWinnable() {
+	            return this.getWinnableLanes() !== void 0;
+	        }
+	    }], [{
+	        key: 'isLaneWinnableBy',
+	        value: function isLaneWinnableBy(who, lane) {
+	
+	            who = who || 'player';
+	            var opposite = who === 'player' ? 'enemy' : 'player';
+	
+	            // Every lane is empty or lane has some signs of same kind
+	            return (0, _lodash.every)(lane, { body: 'empty' }) || (0, _lodash.some)(lane, { who: who }) && !(0, _lodash.some)(lane, { who: opposite });
+	        }
+	
+	        /**
+	         *
+	         * @param lane
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isLaneWinnable',
+	        value: function isLaneWinnable(lane) {
+	            // Lane is empty or have signs of same kind
+	            return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
+	        }
+	
+	        /**
+	         * Returns true if cell is empty
+	         * @param cell {Object}
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isEmpty',
+	        value: function isEmpty(cell) {
+	            if (cell === void 0) {
+	                throw new Error('Argument is undefined');
+	            }
+	            return cell.body === 'empty';
+	        }
+	
+	        /**
+	         * Returns winChance for given lane
+	         * @param lane {Array}
+	         * @returns {Number}
+	         */
+	
+	    }, {
+	        key: 'getLaneWinChance',
+	        value: function getLaneWinChance(lane) {
+	
+	            if (!TicTacToeGrid.isLaneWinnable(lane)) return 0; // lane is unwinnable
+	
+	            var emptyCells = 0;
+	
+	            // Count lanes' empty cells
+	            lane.forEach(function (cell) {
+	                if (TicTacToeGrid.isEmpty(cell)) emptyCells++;
+	            });
+	
+	            return lane.length / emptyCells / lane.length;
+	        }
+	    }]);
+	
+	    return TicTacToeGrid;
+	}(_Grid3.default);
+	
+	exports.default = TicTacToeGrid;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _lodash = __webpack_require__(14);
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Grid = function () {
+	    function Grid() {
+	        _classCallCheck(this, Grid);
+	
+	        this.gridInit = false;
+	    }
+	
+	    /**
+	     * Returns true if cell is empty
+	     * @param pos {Object} cells' position
+	     * @returns {boolean}
+	     */
+	
+	
+	    _createClass(Grid, [{
+	        key: 'init',
+	
+	
+	        /**
+	         * Initialize cells' array with given size or from previous state if given
+	         * @param size
+	         * @returns {Promise}
+	         */
+	        value: function init(size) {
+	            var _this = this;
+	
+	            if (!(0, _lodash.isNumber)(size) && !prevState) throw new Error('Size must be a number');
+	
+	            return new Promise(function (resolve, reject) {
+	                try {
+	
+	                    _this.size = size;
+	                    _this.cells = _this.initEmpty(_this.size);
+	
+	                    _this.gridInit = true;
+	
+	                    // Return success if grid was initialized
+	                    resolve(_this.gridInit);
+	                } catch (err) {
+	                    reject(err);
+	                }
+	            });
+	        }
+	
+	        /**
+	         * Inits cells array with empty cells
+	         * @returns {Array}
+	         */
+	
+	    }, {
+	        key: 'initEmpty',
+	        value: function initEmpty() {
+	
+	            var cells = [];
+	            var i, j;
+	            for (i = 0; i < this.size; i++) {
+	                cells[i] = [];
+	                for (j = 0; j < this.size; j++) {
+	                    // Empty cell
+	                    cells[i][j] = null;
+	                }
+	            }
+	            return cells;
+	        }
+	
+	        /**
 	         * Returns' cell by position
 	         * @param pos {Object} position object {x:, y:}
 	         * @returns {*}
@@ -32657,6 +32950,24 @@
 	        key: 'getCell',
 	        value: function getCell(pos) {
 	            return this.cells[pos.y][pos.x];
+	        }
+	
+	        /**
+	         * Sets body for needed cells'
+	         * @param pos
+	         * @param body
+	         * @returns {boolean} true if set
+	         */
+	
+	    }, {
+	        key: 'setCell',
+	        value: function setCell(pos, body) {
+	
+	            if (pos.x >= this.size || pos.y >= this.size) throw new Error('Unavaiable position');
+	
+	            this.cells[pos.y][pos.x] = body;
+	
+	            return true;
 	        }
 	
 	        /**
@@ -32843,99 +33154,20 @@
 	            this.forEachRow(cb);
 	            this.forEachColumn(cb);
 	        }
-	
-	        /**
-	         * Checks if there are lanes with all players' or all enemy's signs in it
-	         *
-	         * @returns {bool} true if there is a winning lane
-	         */
-	
-	    }, {
-	        key: 'isDone',
-	        value: function isDone() {
-	
-	            var doneState = void 0;
-	
-	            this.forEachLane(function (lane) {
-	                if ((0, _lodash.every)(lane, { who: 'player' })) {
-	                    doneState = {
-	                        who: 'player',
-	                        lane: lane
-	                    };
-	                } else if ((0, _lodash.every)(lane, { who: 'enemy' })) {
-	                    doneState = {
-	                        who: 'enemy',
-	                        lane: lane
-	                    };
-	                }
-	            });
-	
-	            return doneState || false;
-	        }
-	
-	        /**
-	         * returns array of lanes which is possible to win
-	         * @param who {String} - 'player' || 'enemy' (optional) - get winnable lane by player or enemy only
-	         * @returns {Array}
-	         */
-	
-	    }, {
-	        key: 'getWinnableLanes',
-	        value: function getWinnableLanes(who) {
-	
-	            var possibleWinLanes = [];
-	            if (!(0, _isUndefined2.default)(who)) {
-	                this.forEachLane(function (lane) {
-	                    if (Grid.isLaneWinnableBy(who, lane)) {
-	                        possibleWinLanes.push(lane);
-	                    }
-	                });
-	            } else {
-	                this.forEachLane(function (lane) {
-	                    if (Grid.isLaneWinnable(lane)) {
-	                        possibleWinLanes.push(lane);
-	                    }
-	                });
-	            }
-	
-	            if (possibleWinLanes.length) {
-	                return possibleWinLanes;
-	            }
-	        }
-	
-	        /**
-	         * returns array of lanes which is possible to win
-	         * @returns {Array}
-	         */
-	
-	    }, {
-	        key: 'getUnwinnableLanes',
-	        value: function getUnwinnableLanes() {
-	
-	            var impossibleWinLanes = [];
-	
-	            this.forEachLane(function (lane) {
-	
-	                if (!Grid.isLaneWinnable(lane)) {
-	                    impossibleWinLanes.push(lane);
-	                }
-	            });
-	
-	            return impossibleWinLanes;
-	        }
-	
-	        /**
-	         * returns true if there are winnable lanes
-	         *
-	         * @returns {boolean}
-	         */
-	
-	    }, {
-	        key: 'isWinnable',
-	        value: function isWinnable() {
-	            return this.getWinnableLanes() !== void 0;
-	        }
 	    }], [{
+	        key: 'isEmpty',
+	        value: function isEmpty(pos) {
+	            return cells[pos.y][pos.x] === void 0;
+	        }
+	
+	        /**
+	         * Returns array of cells that happen in both given lane arrays
+	         * @param array1
+	         * @param array2
+	         * @returns {Array}
+	         */
+	
+	    }, {
 	        key: 'getLanesIntersections',
 	        value: function getLanesIntersections(array1, array2) {
 	
@@ -32950,160 +33182,12 @@
 	
 	            return intersections.length ? intersections : void 0;
 	        }
-	
-	        /**
-	         * Returns if lane is winnable by player or enemy
-	         * @param who {String} - 'player' or 'enemy' (default 'player')
-	         * @param lane
-	         * @returns {boolean}
-	         */
-	
-	    }, {
-	        key: 'isLaneWinnableBy',
-	        value: function isLaneWinnableBy(who, lane) {
-	
-	            who = who || 'player';
-	            var opposite = who === 'player' ? 'enemy' : 'player';
-	
-	            // Every lane is empty or lane has some signs of same kind
-	            return (0, _lodash.every)(lane, { body: 'empty' }) || (0, _lodash.some)(lane, { who: who }) && !(0, _lodash.some)(lane, { who: opposite });
-	        }
-	
-	        /**
-	         *
-	         * @param lane
-	         * @returns {boolean}
-	         */
-	
-	    }, {
-	        key: 'isLaneWinnable',
-	        value: function isLaneWinnable(lane) {
-	            // Lane is empty or have signs of same kind
-	            return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
-	        }
-	
-	        /**
-	         * Returns true if cell is empty
-	         * @param cell {Object}
-	         * @returns {boolean}
-	         */
-	
-	    }, {
-	        key: 'isEmpty',
-	        value: function isEmpty(cell) {
-	            if (cell === void 0) {
-	                throw new Error('Argument is undefined');
-	            }
-	            return cell.body === 'empty';
-	        }
-	
-	        /**
-	         * Returns winChance for given lane
-	         * @param lane {Array}
-	         * @returns {Number}
-	         */
-	
-	    }, {
-	        key: 'getLaneWinChance',
-	        value: function getLaneWinChance(lane) {
-	
-	            if (!Grid.isLaneWinnable(lane)) return 0; // lane is unwinnable
-	
-	            var emptyCells = 0;
-	
-	            // Count lanes' empty cells
-	            lane.forEach(function (cell) {
-	                if (Grid.isEmpty(cell)) emptyCells++;
-	            });
-	
-	            return lane.length / emptyCells / lane.length;
-	        }
 	    }]);
 	
 	    return Grid;
 	}();
 	
 	exports.default = Grid;
-
-/***/ },
-/* 12 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Sign = function Sign(who, body, pos) {
-	    _classCallCheck(this, Sign);
-	
-	    this.who = who;
-	    this.body = body;
-	    this.pos = pos;
-	    this.winChance = null;
-	};
-	
-	var PlayerSign = function (_Sign) {
-	    _inherits(PlayerSign, _Sign);
-	
-	    function PlayerSign(pos) {
-	        _classCallCheck(this, PlayerSign);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(PlayerSign).call(this, 'player', 0, pos));
-	    }
-	
-	    return PlayerSign;
-	}(Sign);
-	
-	var EnemySign = function (_Sign2) {
-	    _inherits(EnemySign, _Sign2);
-	
-	    function EnemySign(pos) {
-	        _classCallCheck(this, EnemySign);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EnemySign).call(this, 'enemy', 1, pos));
-	    }
-	
-	    return EnemySign;
-	}(Sign);
-	
-	var EmptySign = function (_Sign3) {
-	    _inherits(EmptySign, _Sign3);
-	
-	    function EmptySign(pos) {
-	        _classCallCheck(this, EmptySign);
-	
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EmptySign).call(this, 'nobody', 'empty', pos));
-	    }
-	
-	    return EmptySign;
-	}(Sign);
-	
-	exports.Sign = Sign;
-	exports.PlayerSign = PlayerSign;
-	exports.EnemySign = EnemySign;
-	exports.EmptySign = EmptySign;
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.default = isUndefined;
-	function isUndefined(value) {
-	    return value === void 0;
-	}
 
 /***/ },
 /* 14 */
@@ -49542,6 +49626,86 @@
 	    value: true
 	});
 	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Sign = function Sign(who, body, pos) {
+	    _classCallCheck(this, Sign);
+	
+	    this.who = who;
+	    this.body = body;
+	    this.pos = pos;
+	    this.winChance = null;
+	};
+	
+	var PlayerSign = function (_Sign) {
+	    _inherits(PlayerSign, _Sign);
+	
+	    function PlayerSign(pos) {
+	        _classCallCheck(this, PlayerSign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(PlayerSign).call(this, 'player', 0, pos));
+	    }
+	
+	    return PlayerSign;
+	}(Sign);
+	
+	var EnemySign = function (_Sign2) {
+	    _inherits(EnemySign, _Sign2);
+	
+	    function EnemySign(pos) {
+	        _classCallCheck(this, EnemySign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EnemySign).call(this, 'enemy', 1, pos));
+	    }
+	
+	    return EnemySign;
+	}(Sign);
+	
+	var EmptySign = function (_Sign3) {
+	    _inherits(EmptySign, _Sign3);
+	
+	    function EmptySign(pos) {
+	        _classCallCheck(this, EmptySign);
+	
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(EmptySign).call(this, 'nobody', 'empty', pos));
+	    }
+	
+	    return EmptySign;
+	}(Sign);
+	
+	exports.Sign = Sign;
+	exports.PlayerSign = PlayerSign;
+	exports.EnemySign = EnemySign;
+	exports.EmptySign = EmptySign;
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = isUndefined;
+	function isUndefined(value) {
+	    return value === void 0;
+	}
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -49574,7 +49738,7 @@
 	exports.default = GameStorage;
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49585,19 +49749,19 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _grid = __webpack_require__(11);
+	var _grid = __webpack_require__(12);
 	
 	var _grid2 = _interopRequireDefault(_grid);
 	
-	var _isUndefined = __webpack_require__(13);
+	var _isUndefined = __webpack_require__(17);
 	
 	var _isUndefined2 = _interopRequireDefault(_isUndefined);
 	
-	var _allMaxBy = __webpack_require__(18);
+	var _allMaxBy = __webpack_require__(20);
 	
 	var _allMaxBy2 = _interopRequireDefault(_allMaxBy);
 	
-	var _randomInt = __webpack_require__(19);
+	var _randomInt = __webpack_require__(21);
 	
 	var _randomInt2 = _interopRequireDefault(_randomInt);
 	
@@ -49809,7 +49973,7 @@
 	exports.default = Enemy;
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49819,7 +49983,7 @@
 	});
 	exports.default = allMaxBy;
 	
-	var _isUndefined = __webpack_require__(13);
+	var _isUndefined = __webpack_require__(17);
 	
 	var _isUndefined2 = _interopRequireDefault(_isUndefined);
 	
@@ -49845,7 +50009,7 @@
 	}
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -49859,7 +50023,77 @@
 	}
 
 /***/ },
-/* 20 */
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _angular = __webpack_require__(2);
+	
+	var _angular2 = _interopRequireDefault(_angular);
+	
+	var _gameInfo = __webpack_require__(23);
+	
+	var _gameInfo2 = _interopRequireDefault(_gameInfo);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	_angular2.default.module('info', []).component('gameInfo', _gameInfo2.default);
+	
+	exports.default = _angular2.default.module('info');
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var gameInfoComponent = {
+	    templateUrl: 'templates/gameInfo.template.html',
+	    bindings: {
+	        gameEnded: '<',
+	        gameStatus: '<',
+	        playerMove: '<',
+	        playerSign: '<',
+	        enemySign: '<'
+	    }
+	};
+	
+	exports.default = gameInfoComponent;
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _angular = __webpack_require__(2);
+	
+	var _angular2 = _interopRequireDefault(_angular);
+	
+	var _fieldCell = __webpack_require__(25);
+	
+	var _fieldCell2 = _interopRequireDefault(_fieldCell);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	_angular2.default.module('cell', []).component('fieldCell', _fieldCell2.default);
+	
+	exports.default = _angular2.default.module('cell');
+
+/***/ },
+/* 25 */
 /***/ function(module, exports) {
 
 	'use strict';

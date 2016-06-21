@@ -3,7 +3,7 @@
 import Grid from '../../services/grid.service';
 import GameStorage from '../../services/gameStorage.service';
 import Enemy from '../../services/enemy.service';
-import {PlayerSign, EnemySign} from '../../Sign';
+import {PlayerSign, EnemySign} from '../../base/Sign';
 
 import {isUndefined} from 'lodash';
 

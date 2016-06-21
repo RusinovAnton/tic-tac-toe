@@ -4,7 +4,7 @@ import {assert, expect} from 'chai';
 import {isArray} from 'lodash';
 
 import Grid from '../../app/services/grid.service';
-import {PlayerSign, EnemySign} from '../../app/Sign';
+import {PlayerSign, EnemySign} from '../../app/base/Sign';
 
 let mockGrid = new Grid();
 

@@ -1,20 +1,17 @@
 import angular                  from 'angular';
 import ngRoute                  from 'angular-route';
 
-import gameNewComponent         from './components/gameNew/gameNew.component';
-import gameInfoComponent        from './components/gameInfo/gameInfo.component';
-import gameFieldComponent       from './components/gameField/gameField.component';
-import fieldCellComponent       from './components/fieldCell/fieldCell.component';
+import start from './modules/start.module';
+import field from './modules/field.module';
+import info from './modules/info.module';
+import cell from './modules/cell.module';
 
 angular
     .module('ticTacToe', [
         'ngRoute',
         'start',
         'field'
-    ]);
-
-angular
-    .module('ticTacToe')
+    ])
     .config(['$locationProvider', '$routeProvider',
         ($locationProvider, $routeProvider) => {
             $locationProvider.hashPrefix('!');
@@ -28,19 +25,3 @@ angular
                 .otherwise('/new');
         }
     ]);
-
-angular
-    .module('start', [])
-    .component('gameNew', gameNewComponent);
-
-angular
-    .module('field', ['info', 'cell'])
-    .component('gameField', gameFieldComponent);
-
-angular
-    .module('info', [])
-    .component('gameInfo', gameInfoComponent);
-
-angular
-    .module('cell', [])
-    .component('fieldCell', fieldCellComponent);
