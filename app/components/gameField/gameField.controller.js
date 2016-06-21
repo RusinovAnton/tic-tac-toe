@@ -8,8 +8,8 @@ import {PlayerSign, EnemySign} from '../../Sign';
 import {isUndefined} from 'lodash';
 
 function playersMove() {
-    // return Math.random() >= 0.5;
-    return true;
+    // return true;
+    return Math.random() >= 0.5;
 }
 
 export default class gameFieldController {

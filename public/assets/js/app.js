@@ -73,7 +73,7 @@
 	
 	var _gameField2 = _interopRequireDefault(_gameField);
 	
-	var _fieldCell = __webpack_require__(17);
+	var _fieldCell = __webpack_require__(20);
 	
 	var _fieldCell2 = _interopRequireDefault(_fieldCell);
 	
@@ -32286,23 +32286,24 @@
 	
 	var _grid2 = _interopRequireDefault(_grid);
 	
-	var _gameStorage = __webpack_require__(15);
+	var _gameStorage = __webpack_require__(16);
 	
 	var _gameStorage2 = _interopRequireDefault(_gameStorage);
 	
-	var _enemy = __webpack_require__(16);
+	var _enemy = __webpack_require__(17);
 	
 	var _enemy2 = _interopRequireDefault(_enemy);
 	
 	var _Sign = __webpack_require__(12);
 	
-	var _lodash = __webpack_require__(13);
+	var _lodash = __webpack_require__(14);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function playersMove() {
+	    // return true;
 	    return Math.random() >= 0.5;
 	}
 	
@@ -32384,9 +32385,8 @@
 	            if (this.gameEnded) return;
 	
 	            // Do nothing if choosen cell isn't empty already
-	            if (!this.grid.isEmpty(this.grid.getCell(pos))) return;
+	            if (!_grid2.default.isEmpty(this.grid.getCell(pos))) return;
 	
-	            this.enemy.storeUserMove(pos);
 	            this.grid.setCell(pos, new _Sign.PlayerSign(pos));
 	
 	            if (this.isGameEnded()) return;
@@ -32478,6 +32478,7 @@
 	        value: function isGameEnded() {
 	
 	            // Draw when there is no way to win
+	            // TODO: cache winnable lanes for user/enemy turns' cycle step
 	            if (!this.grid.isWinnable()) {
 	                this.drawGame();
 	                return true;
@@ -32526,7 +32527,13 @@
 	
 	var _Sign = __webpack_require__(12);
 	
-	var _lodash = __webpack_require__(13);
+	var _isUndefined = __webpack_require__(13);
+	
+	var _isUndefined2 = _interopRequireDefault(_isUndefined);
+	
+	var _lodash = __webpack_require__(14);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -32537,8 +32544,24 @@
 	        this.gridInit = false;
 	    }
 	
+	    /**
+	     * Returns array of cells that happen in both given lane arrays
+	     * @param array1
+	     * @param array2
+	     * @returns {Array}
+	     */
+	
+	
 	    _createClass(Grid, [{
 	        key: 'init',
+	
+	
+	        /**
+	         * Initialize cells' array with given size or from previous state if given
+	         * @param size
+	         * @param prevState
+	         * @returns {Promise}
+	         */
 	        value: function init(size, prevState) {
 	            var _this = this;
 	
@@ -32547,25 +32570,32 @@
 	            return new Promise(function (resolve, reject) {
 	                try {
 	
-	                    if (prevState === null || (0, _lodash.isUndefined)(prevState)) {
+	                    if (!prevState) {
 	                        _this.size = size;
-	                        _this.cells = _this.empty(_this.size);
+	                        _this.cells = _this.initEmpty(_this.size);
 	                    } else {
 	                        _this.size = prevState.size;
 	                        _this.prevState = prevState;
-	                        _this.cells = _this.fromState();
+	                        _this.cells = _this.initFromState();
 	                    }
 	
 	                    _this.gridInit = true;
+	                    // Return success if grid was initialized
 	                    resolve(_this.gridInit);
 	                } catch (err) {
 	                    reject(err);
 	                }
 	            });
 	        }
+	
+	        /**
+	         * Inits cells array with empty cells
+	         * @returns {Array}
+	         */
+	
 	    }, {
-	        key: 'empty',
-	        value: function empty() {
+	        key: 'initEmpty',
+	        value: function initEmpty() {
 	
 	            var cells = [];
 	            var i, j;
@@ -32578,9 +32608,15 @@
 	            }
 	            return cells;
 	        }
+	
+	        /**
+	         * Inits cells array with cells from state
+	         * @returns {Array}
+	         */
+	
 	    }, {
-	        key: 'fromState',
-	        value: function fromState() {
+	        key: 'initFromState',
+	        value: function initFromState() {
 	
 	            var cells = [];
 	
@@ -32594,14 +32630,14 @@
 	
 	            return cells;
 	        }
-	    }, {
-	        key: 'isEmpty',
-	        value: function isEmpty(cell) {
-	            if (cell === void 0) {
-	                throw new Error('Argument is undefined');
-	            }
-	            return cell.body === 'empty';
-	        }
+	
+	        /**
+	         * Sets body for needed cells'
+	         * @param pos
+	         * @param body
+	         * @returns {boolean} true if set
+	         */
+	
 	    }, {
 	        key: 'setCell',
 	        value: function setCell(pos, body) {
@@ -32610,12 +32646,19 @@
 	
 	            if (!(0, _lodash.isObject)(pos)) throw new Error('Expected pos to be an object');
 	
-	            if ((0, _lodash.isUndefined)(pos.x) && (0, _lodash.isUndefined)(pos.y)) throw new Error('There is no coordinates in the pos obj');
+	            if ((0, _isUndefined2.default)(pos.x) && (0, _isUndefined2.default)(pos.y)) throw new Error('There is no coordinates in the pos obj');
 	
 	            this.cells[pos.y][pos.x] = body;
 	
 	            return true;
 	        }
+	
+	        /**
+	         * Returns' cell by position
+	         * @param pos {Object} position object {x:, y:}
+	         * @returns {*}
+	         */
+	
 	    }, {
 	        key: 'getCell',
 	        value: function getCell(pos) {
@@ -32623,28 +32666,27 @@
 	        }
 	
 	        /**
-	         *   Returns array of objects with coordinates of avaiable cells
-	         *   e.g
-	         *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
+	         *  @param lane {Array} (optional) lane array or array of lane arrays to find empty cells in it
+	         *  @returns {Array} of initEmpty cells
 	         */
 	
 	    }, {
 	        key: 'getAvaiableCells',
 	        value: function getAvaiableCells(lane) {
-	            var _this2 = this;
 	
 	            var avaiableCells = [];
 	
 	            if ((0, _lodash.isArray)(lane)) {
+	                lane = (0, _lodash.flatten)(lane);
 	                lane.forEach(function (cell) {
-	                    if (_this2.isEmpty(cell)) {
-	                        avaiableCells.push(cell.pos);
+	                    if (Grid.isEmpty(cell)) {
+	                        avaiableCells.push(cell);
 	                    }
 	                });
 	            } else {
 	                this.cells.forEach(function (row) {
 	                    row.forEach(function (cell) {
-	                        if (_this2.isEmpty(cell)) avaiableCells.push(cell.pos);
+	                        if (Grid.isEmpty(cell)) avaiableCells.push(cell);
 	                    });
 	                });
 	            }
@@ -32653,7 +32695,7 @@
 	        }
 	
 	        /**
-	         * True if there is avaiable cells
+	         * True if there are cells avaiable
 	         *
 	         * @returns {boolean}
 	         */
@@ -32705,14 +32747,29 @@
 	            }
 	            return diagonal;
 	        }
+	
+	        /**
+	         * Returns needed row from grid by its' index
+	         * @param index {Number}
+	         * @returns {Array}
+	         */
+	
 	    }, {
 	        key: 'getRow',
 	        value: function getRow(index) {
 	            return this.cells[index];
 	        }
+	
+	        /**
+	         * Returns' needed column from grid by its' index
+	         * @param index
+	         * @returns {Array}
+	         */
+	
 	    }, {
 	        key: 'getColumn',
 	        value: function getColumn(index) {
+	
 	            var col = [];
 	            // Iterates throw each grids' row and compose column array
 	            this.forEachRow(function (row) {
@@ -32721,10 +32778,18 @@
 	
 	            return col;
 	        }
+	
+	        /**
+	         * Returns' central cell or false if impossible
+	         * @returns {Object || undefined}
+	         */
+	
 	    }, {
-	        key: 'getDiagonals',
-	        value: function getDiagonals(index) {
-	            return [this.getFirstDiagonal(), this.getSecondDiagonal()][index];
+	        key: 'getCenter',
+	        value: function getCenter() {
+	
+	            if (this.size % 2 === 0) return void 0;
+	            return this.cells[(this.size - 1) / 2][(this.size - 1) / 2];
 	        }
 	
 	        /**
@@ -32737,7 +32802,7 @@
 	        key: 'forEachDiagonal',
 	        value: function forEachDiagonal(cb) {
 	            for (var i = 0; i < 2; i++) {
-	                cb(this.getDiagonals(i), i, 'diagonal');
+	                cb([this.getFirstDiagonal(), this.getSecondDiagonal()][i], i, 'diagonal');
 	            }
 	        }
 	
@@ -32788,7 +32853,7 @@
 	        /**
 	         * Checks if there are lanes with all players' or all enemy's signs in it
 	         *
-	         * @returns {bool} true if there are a winning lane
+	         * @returns {bool} true if there is a winning lane
 	         */
 	
 	    }, {
@@ -32813,37 +32878,52 @@
 	
 	            return doneState || false;
 	        }
-	    }, {
-	        key: 'isLaneWinnableBy',
-	        value: function isLaneWinnableBy(who, lane) {
 	
-	            who = who || 'player';
-	            var opposite = who === 'player' ? 'enemy' : 'player';
+	        /**
+	         * returns array of lanes which is possible to win
+	         * @param who {String} - 'player' || 'enemy' (optional) - get winnable lane by player or enemy only
+	         * @returns {Array}
+	         */
 	
-	            return (0, _lodash.some)(lane, { who: who }) && !(0, _lodash.some)(lane, { who: opposite }) || (0, _lodash.every)(lane, { body: 'empty' });
-	        }
-	    }, {
-	        key: 'isLaneWinnable',
-	        value: function isLaneWinnable(lane) {
-	            return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
-	        }
 	    }, {
 	        key: 'getWinnableLanes',
 	        value: function getWinnableLanes(who) {
-	            var _this3 = this;
 	
 	            var possibleWinLanes = [];
 	
 	            this.forEachLane(function (lane) {
-	                if (!(0, _lodash.isUndefined)(who) && !_this3.isLaneWinnableBy(who, lane)) {
+	                if (!(0, _isUndefined2.default)(who) && !Grid.isLaneWinnableBy(who, lane)) {
 	                    return;
-	                } else if (!_this3.isLaneWinnable(lane)) {
+	                } else if (!Grid.isLaneWinnable(lane)) {
 	                    return;
 	                }
 	                possibleWinLanes.push(lane);
 	            });
 	
-	            return possibleWinLanes;
+	            if (possibleWinLanes.length) {
+	                return possibleWinLanes;
+	            }
+	        }
+	
+	        /**
+	         * returns array of lanes which is possible to win
+	         * @returns {Array}
+	         */
+	
+	    }, {
+	        key: 'getUnwinnableLanes',
+	        value: function getUnwinnableLanes() {
+	
+	            var impossibleWinLanes = [];
+	
+	            this.forEachLane(function (lane) {
+	
+	                if (!Grid.isLaneWinnable(lane)) {
+	                    impossibleWinLanes.push(lane);
+	                }
+	            });
+	
+	            return impossibleWinLanes;
 	        }
 	
 	        /**
@@ -32855,7 +32935,90 @@
 	    }, {
 	        key: 'isWinnable',
 	        value: function isWinnable() {
-	            return this.getWinnableLanes().length !== 0;
+	            return this.getWinnableLanes() !== void 0;
+	        }
+	    }], [{
+	        key: 'getLanesIntersections',
+	        value: function getLanesIntersections(array1, array2) {
+	
+	            if (!((0, _lodash.isArray)(array1) && (0, _lodash.isArray)(array2))) {
+	                return void 0;
+	            }
+	
+	            array1 = (0, _lodash.flatten)(array1);
+	            array2 = (0, _lodash.flatten)(array2);
+	
+	            var intersections = (0, _lodash.intersectionWith)(array1, array2, _lodash.isEqual);
+	
+	            return intersections.length ? intersections : void 0;
+	        }
+	
+	        /**
+	         * Returns if lane is winnable by player or enemy
+	         * @param who {String} - 'player' or 'enemy' (default 'player')
+	         * @param lane
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isLaneWinnableBy',
+	        value: function isLaneWinnableBy(who, lane) {
+	
+	            who = who || 'player';
+	            var opposite = who === 'player' ? 'enemy' : 'player';
+	
+	            // Every lane is empty or lane has some signs of same kind
+	            return (0, _lodash.every)(lane, { body: 'empty' }) || (0, _lodash.some)(lane, { who: who }) && !(0, _lodash.some)(lane, { who: opposite });
+	        }
+	
+	        /**
+	         *
+	         * @param lane
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isLaneWinnable',
+	        value: function isLaneWinnable(lane) {
+	            // Lane is empty or have signs of same kind
+	            return !((0, _lodash.some)(lane, { who: 'player' }) && (0, _lodash.some)(lane, { who: 'enemy' }));
+	        }
+	
+	        /**
+	         * Returns true if cell is empty
+	         * @param cell {Object}
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isEmpty',
+	        value: function isEmpty(cell) {
+	            if (cell === void 0) {
+	                throw new Error('Argument is undefined');
+	            }
+	            return cell.body === 'empty';
+	        }
+	
+	        /**
+	         * Returns winChance for given lane
+	         * @param lane {Array}
+	         * @returns {Number}
+	         */
+	
+	    }, {
+	        key: 'getLaneWinChance',
+	        value: function getLaneWinChance(lane) {
+	
+	            if (!Grid.isLaneWinnable(lane)) return 0; // lane is unwinnable
+	
+	            var emptyCells = 0;
+	
+	            // Count lanes' empty cells
+	            lane.forEach(function (cell) {
+	                if (Grid.isEmpty(cell)) emptyCells++;
+	            });
+	
+	            return lane.length / emptyCells / lane.length;
 	        }
 	    }]);
 	
@@ -32886,6 +33049,7 @@
 	    this.who = who;
 	    this.body = body;
 	    this.pos = pos;
+	    this.winChance = null;
 	};
 	
 	var PlayerSign = function (_Sign) {
@@ -32931,6 +33095,20 @@
 
 /***/ },
 /* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = isUndefined;
+	function isUndefined(value) {
+	    return value === void 0;
+	}
+
+/***/ },
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -49338,10 +49516,10 @@
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)(module), (function() { return this; }())))
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -49357,7 +49535,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -49398,7 +49576,7 @@
 	exports.default = GameStorage;
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -49409,7 +49587,25 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _lodash = __webpack_require__(13);
+	var _grid = __webpack_require__(11);
+	
+	var _grid2 = _interopRequireDefault(_grid);
+	
+	var _isUndefined = __webpack_require__(13);
+	
+	var _isUndefined2 = _interopRequireDefault(_isUndefined);
+	
+	var _allMaxBy = __webpack_require__(18);
+	
+	var _allMaxBy2 = _interopRequireDefault(_allMaxBy);
+	
+	var _randomInt = __webpack_require__(19);
+	
+	var _randomInt2 = _interopRequireDefault(_randomInt);
+	
+	var _lodash = __webpack_require__(14);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -49418,151 +49614,189 @@
 	        _classCallCheck(this, Enemy);
 	
 	        this._grid = null;
-	        this.userMoves = [];
 	    }
 	
 	    _createClass(Enemy, [{
 	        key: 'move',
 	        value: function move() {
 	
-	            var avaiableCell = this._grid.getAvaiableCells()[0];
-	
-	            var movePos = this.predictUserMove() || this.possibleWinMove() || { x: avaiableCell.x, y: avaiableCell.y };
+	            var movePos = this.possibleWinMove();
 	
 	            return new Promise(function (resolve, reject) {
+	
+	                if (!movePos) {
+	                    reject(new Error('There is no move position object'));
+	                }
+	
 	                // Setting timeout to mock enemys' thinking time
 	                setTimeout(function () {
 	                    resolve(movePos);
 	                }, 500);
 	            });
 	        }
-	    }, {
-	        key: 'storeUserMove',
-	        value: function storeUserMove(pos) {
-	            if (this.userMoves.length >= 2) {
-	                this.userMoves.shift();
-	            }
-	            this.userMoves.push(pos);
-	        }
-	    }, {
-	        key: 'predictUserMove',
-	        value: function predictUserMove() {
-	            var vector = void 0;
-	            var _self = this;
 	
-	            var prevMove = this.userMoves[0];
-	            var lastMove = this.userMoves[1];
+	        /**
+	         * @returns {pos || false} position object ({x: , y: }) or false if there is no possible moves
+	         */
 	
-	            function isVector(vector) {
-	                // Check if vector is valid. It can be -1, 0, 1
-	                return vector.x >= -1 && vector.x <= 1 && vector.y >= -1 && vector.y <= 1 &&
-	                // Check if cell choosen by vector is in the scope of _grid
-	                lastMove.x + vector.x >= 0 && lastMove.x + vector.x < _self._grid.size && lastMove.y + vector.y >= 0 && lastMove.y + vector.y < _self._grid.size &&
-	                // Check if cell is empty
-	                _self._grid.isEmpty(_self._grid.getCell({
-	                    x: lastMove.x + vector.x,
-	                    y: lastMove.y + vector.y
-	                }));
-	            }
-	
-	            if (this.userMoves.length >= 2) {
-	                vector = {
-	                    x: lastMove.x - prevMove.x,
-	                    y: lastMove.y - prevMove.y
-	                };
-	                if (isVector(vector)) {
-	                    return { x: lastMove.x + vector.x, y: lastMove.y + vector.y };
-	                }
-	            }
-	
-	            return false;
-	        }
 	    }, {
 	        key: 'possibleWinMove',
 	        value: function possibleWinMove() {
-	            var _this = this;
 	
-	            function getIntersections(userLanes, enemyLanes) {
+	            // Take central cell if possible
+	            var centerCell = this._grid.getCenter();
+	            if (centerCell && _grid2.default.isEmpty(centerCell)) return centerCell.pos;
 	
-	                var possibleWinMoves = [];
+	            this.setCellChances();
 	
-	                userLanes.forEach(function (lane) {
-	                    enemyLanes.forEach(function (enemyLane) {
-	                        possibleWinMoves = possibleWinMoves.concat((0, _lodash.intersectionWith)(lane, enemyLane, _lodash.isEqual));
-	                    });
-	                });
-	
-	                return possibleWinMoves;
-	            }
-	
-	            var winPos = void 0;
-	            var enemyWin = this.getWinLanes('enemy');
-	            var userWin = this.getWinLanes('player');
-	
-	            if (enemyWin.lanes.length && userWin.lanes.length) {
-	
-	                winPos = getIntersections(userWin.lanes, enemyWin.lanes);
-	                if (winPos.length) return winPos[0].pos;
-	
-	                if (userWin.rate > enemyWin.rate) {
-	                    winPos = this._grid.getAvaiableCells(userWin.lanes[0]);
-	                    return winPos[0];
-	                } else {
-	                    winPos = this._grid.getAvaiableCells(enemyWin.lanes[0]);
-	                    return winPos[0];
-	                }
-	            }
-	
-	            var possibleMoves = [];
-	
-	            this._grid.getWinnableLanes('enemy').forEach(function (cell) {
-	                if (_this._grid.isEmpty(cell)) possibleMoves.push(cell);
-	            });
-	
-	            if (possibleMoves.length) {
-	                return possibleMoves[0].pos;
-	            }
-	
-	            possibleMoves = [];
-	
-	            this._grid.getWinnableLanes('player').forEach(function (cell) {
-	                if (_this._grid.isEmpty(cell)) possibleMoves.push(cell);
-	            });
-	
-	            if (possibleMoves.length) {
-	                return possibleMoves[0].pos;
-	            }
-	
-	            return false;
+	            return this.getMaxChancePosition() || this.getIntersectionPosition() || this.getWinnablePosition();
 	        }
 	    }, {
-	        key: 'getWinLanes',
-	        value: function getWinLanes(who) {
+	        key: 'getMaxChancePosition',
+	        value: function getMaxChancePosition() {
 	
-	            var lanes = this._grid.getWinnableLanes(who);
+	            this.maxChanceCells = this.getMaxChanceCells();
 	
-	            var chancesArray = [];
+	            if (!this.maxChanceCells || !this.maxChanceCells.length) return false;
+	
+	            // if there is only one cell with max winChance
+	            else if (this.maxChanceCells.length === 1) return this.maxChanceCells[0].pos;
+	
+	                // if there are cells which win game on next turn
+	                else if (this.getMaxChance() === 1) {
+	
+	                        var enemyMaxChanceLanes = this.getMaxChanceLanes('enemy');
+	                        var playerMaxChanceLanes = this.getMaxChanceLanes('player');
+	
+	                        if (!(0, _isUndefined2.default)(enemyMaxChanceLanes)) {
+	                            // take Enemys' win cell - win!
+	                            return this._grid.getAvaiableCells(enemyMaxChanceLanes[0])[0].pos;
+	                        } else if (!(0, _isUndefined2.default)(playerMaxChanceLanes)) {
+	                            // Take Players win cell to prevent player from win
+	                            return this._grid.getAvaiableCells(playerMaxChanceLanes[0])[0].pos;
+	                        }
+	                    }
+	        }
+	
+	        /**
+	         * Returns position which is intersection of winnable lanes for enemy and player with maximum winChance if possible
+	         * @returns {Object} position
+	         */
+	
+	    }, {
+	        key: 'getIntersectionPosition',
+	        value: function getIntersectionPosition() {
+	
+	            var playerWinnableLanes = this._grid.getWinnableLanes('player');
+	            var enemyWinnableLanes = this._grid.getWinnableLanes('enemy');
+	
+	            var playerMaxChanceLanes = playerWinnableLanes ? this.getMaxChanceLanes(playerWinnableLanes) : void 0;
+	            var enemyMaxChanceLanes = enemyWinnableLanes ? this.getMaxChanceLanes(enemyWinnableLanes) : void 0;
+	
+	            var intersections = _grid2.default.getLanesIntersections(playerMaxChanceLanes, enemyMaxChanceLanes) || _grid2.default.getLanesIntersections(playerMaxChanceLanes, enemyWinnableLanes) || _grid2.default.getLanesIntersections(playerWinnableLanes, enemyWinnableLanes);
+	
+	            if (intersections && intersections.length) return intersections[(0, _randomInt2.default)(0, intersections.length)].pos;
+	        }
+	
+	        /**
+	         * Returns position of avaiable winning cell, enemy's preferable
+	         * @returns {Object} position
+	         */
+	
+	    }, {
+	        key: 'getWinnablePosition',
+	        value: function getWinnablePosition() {
+	
+	            var winnableLanes = this._grid.getWinnableLanes('enemy') || this._grid.getWinnableLanes();
+	            var avaiableCells = this._grid.getAvaiableCells(winnableLanes);
+	
+	            var maxChanceCells = (0, _allMaxBy2.default)(avaiableCells, 'winChance');
+	
+	            if (maxChanceCells.length) {
+	                return maxChanceCells[(0, _randomInt2.default)(0, maxChanceCells.length)].pos;
+	            } else {
+	                return avaiableCells[(0, _randomInt2.default)(0, avaiableCells.length)].pos;
+	            }
+	        }
+	
+	        /**
+	         *  Sets winChance for each cell in the winnable lanes
+	         */
+	
+	    }, {
+	        key: 'setCellChances',
+	        value: function setCellChances() {
+	
+	            // Clear previous winChances
+	            this._grid.cells.forEach(function (lane) {
+	                lane.forEach(function (cell) {
+	                    cell.winChance = null;
+	                });
+	            });
+	
+	            this._grid.getWinnableLanes().forEach(function (lane) {
+	                var winChance = _grid2.default.getLaneWinChance(lane);
+	                lane.forEach(function (cell) {
+	                    if (_grid2.default.isEmpty(cell)) cell.winChance = cell.winChance > winChance ? cell.winChance : winChance;
+	                });
+	            });
+	        }
+	
+	        /**
+	         *  Returns maximal winChance value
+	         *  @returns {Number}
+	         */
+	
+	    }, {
+	        key: 'getMaxChance',
+	        value: function getMaxChance() {
+	
+	            var maxChanceCells = this.maxChanceCells || this.getMaxChanceCells();
+	            return (0, _lodash.maxBy)(maxChanceCells, 'winChance')['winChance'];
+	        }
+	
+	        /**
+	         * Returns array with cells that have max winChance
+	         * @returns {Array}
+	         */
+	
+	    }, {
+	        key: 'getMaxChanceCells',
+	        value: function getMaxChanceCells() {
+	
+	            var flattenGrid = (0, _lodash.flatten)(this._grid.cells);
+	            return (0, _allMaxBy2.default)(flattenGrid, 'winChance');
+	        }
+	
+	        /**
+	         * Returns array with lanes which have maximal winChance
+	         * @param lanes {Array} (optional) array from which to find max winChance lanes
+	         * @returns {Array}
+	         */
+	
+	    }, {
+	        key: 'getMaxChanceLanes',
+	        value: function getMaxChanceLanes(lanes) {
+	
+	            var maxChance = this.getMaxChance();
+	            var maxChanceLanes = [];
+	
+	            lanes = (0, _lodash.isArray)(lanes) ? lanes : this._grid.getWinnableLanes(lanes);
+	            var chances = [];
 	
 	            lanes.forEach(function (lane) {
+	                chances.push(_grid2.default.getLaneWinChance(lane));
+	            });
 	
-	                var emptyCells = lane.filter(function (lane) {
-	                    return lane.body === 'empty';
+	            if (chances.indexOf(maxChance) !== -1) {
+	                chances.forEach(function (chance, i) {
+	                    if (chance === maxChance) maxChanceLanes.push(lanes[i]);
 	                });
+	            } else {
+	                return void 0;
+	            }
 	
-	                chancesArray.push((1 / (emptyCells.length / lane.length)).toFixed(2));
-	            });
-	
-	            var maximal = (0, _lodash.max)(chancesArray);
-	            var winLanes = [];
-	
-	            chancesArray.forEach(function (el, i) {
-	                if (el == maximal) winLanes.push(lanes[i]);
-	            });
-	
-	            return {
-	                lanes: winLanes,
-	                rate: maximal
-	            };
+	            return maxChanceLanes;
 	        }
 	    }, {
 	        key: 'grid',
@@ -49577,7 +49811,57 @@
 	exports.default = Enemy;
 
 /***/ },
-/* 17 */
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = allMaxBy;
+	
+	var _isUndefined = __webpack_require__(13);
+	
+	var _isUndefined2 = _interopRequireDefault(_isUndefined);
+	
+	var _lodash = __webpack_require__(14);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function allMaxBy(array, key) {
+	
+	    if (!(0, _lodash.isArray)(array)) throw new Error('First argument must be an array');
+	
+	    var maxByElement = (0, _lodash.maxBy)(array, key);
+	    if ((0, _isUndefined2.default)(maxByElement)) return false;
+	    var maxByValue = maxByElement[key];
+	
+	    var allMaxByArray = [];
+	
+	    array.forEach(function (el) {
+	        if (el[key] === maxByValue) allMaxByArray.push(el);
+	    });
+	
+	    return allMaxByArray;
+	}
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = randomInt;
+	function randomInt(min, max) {
+	    return Math.floor(Math.random() * (max - min)) + min;
+	}
+
+/***/ },
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
