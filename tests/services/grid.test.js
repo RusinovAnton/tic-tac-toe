@@ -49,8 +49,8 @@ describe('Grid()', ()=> {
         }).to.throw(Error);
     });
 
-    describe('.empty()', ()=> {
-        it('should create grid with empty cells', function (done) {
+    describe('.initEmpty()', ()=> {
+        it('should create grid with initEmpty cells', function (done) {
             mockGrid
                 .init(3, null)
                 .then((success)=> {
@@ -72,7 +72,7 @@ describe('Grid()', ()=> {
         });
     });
 
-    describe('fromState()', ()=> {
+    describe('initFromState()', ()=> {
         it('should return grid from state', function (done) {
             this.timeout(10000);
 
@@ -120,7 +120,7 @@ describe('Grid()', ()=> {
     });
 
     describe('isEmpty(cell)', ()=> {
-        it('should return true if cell is empty', function(done) {
+        it('should return true if cell is initEmpty', function(done) {
             mockGrid
                 .init(3)
                 .then((success)=> {
