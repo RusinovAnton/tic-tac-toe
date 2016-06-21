@@ -205,4 +205,20 @@ input.ng-invalid {
     text-align: right;
 }
 
+.link--github {
+    font-size: 0;
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 25px;
+    height: 25px;
+    opacity: 0.7;
+    background-image: url(../images/github.png);
+    background-size: 100% 100%;
+    transition: opacity 0.3s;
+}
 
+.link--github:hover {
+    opacity: 1;
+}
