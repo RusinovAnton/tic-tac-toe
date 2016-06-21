@@ -32347,7 +32347,7 @@
 	        key: 'setGridSize',
 	        value: function setGridSize(routeSize, state) {
 	            if (!(0, _lodash.isUndefined)(routeSize)) {
-	                routeSize = routeSize >= 3 && routeSize <= 100 ? parseInt(routeSize) : 3;
+	                routeSize = routeSize >= 3 && routeSize <= 20 ? parseInt(routeSize) : 3;
 	                if (state !== null) {
 	                    if (state.size !== routeSize) this.store.clearState();
 	                }
@@ -32477,9 +32477,9 @@
 	        key: 'isGameEnded',
 	        value: function isGameEnded() {
 	
-	            // Draw when there is no way to win
+	            // Draw when there is no way to win or there are no more avaiable cells
 	            // TODO: cache winnable lanes for user/enemy turns' cycle step
-	            if (!this.grid.isWinnable()) {
+	            if (!this.grid.isWinnable() || !this.grid.cellsAvaiable()) {
 	                this.drawGame();
 	                return true;
 	            }
@@ -32488,12 +32488,6 @@
 	            var isDone = this.grid.isDone();
 	            if (isDone) {
 	                this.endGame(isDone);
-	                return true;
-	            }
-	
-	            // Draw if there is no more avaiable cells
-	            if (!this.grid.cellsAvaiable()) {
-	                this.drawGame();
 	                return true;
 	            }
 	
@@ -32890,15 +32884,19 @@
 	        value: function getWinnableLanes(who) {
 	
 	            var possibleWinLanes = [];
-	
-	            this.forEachLane(function (lane) {
-	                if (!(0, _isUndefined2.default)(who) && !Grid.isLaneWinnableBy(who, lane)) {
-	                    return;
-	                } else if (!Grid.isLaneWinnable(lane)) {
-	                    return;
-	                }
-	                possibleWinLanes.push(lane);
-	            });
+	            if (!(0, _isUndefined2.default)(who)) {
+	                this.forEachLane(function (lane) {
+	                    if (Grid.isLaneWinnableBy(who, lane)) {
+	                        possibleWinLanes.push(lane);
+	                    }
+	                });
+	            } else {
+	                this.forEachLane(function (lane) {
+	                    if (Grid.isLaneWinnable(lane)) {
+	                        possibleWinLanes.push(lane);
+	                    }
+	                });
+	            }
 	
 	            if (possibleWinLanes.length) {
 	                return possibleWinLanes;

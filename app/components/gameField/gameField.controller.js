@@ -50,7 +50,7 @@ export default class gameFieldController {
 
     setGridSize(routeSize, state) {
         if (!isUndefined(routeSize)) {
-            routeSize = routeSize >= 3 && routeSize <= 100 ? parseInt(routeSize) : 3;
+            routeSize = routeSize >= 3 && routeSize <= 20 ? parseInt(routeSize) : 3;
             if (state !== null) {
                 if (state.size !== routeSize) this.store.clearState();
             }
@@ -169,9 +169,9 @@ export default class gameFieldController {
 
     isGameEnded() {
 
-        // Draw when there is no way to win
+        // Draw when there is no way to win or there are no more avaiable cells
         // TODO: cache winnable lanes for user/enemy turns' cycle step
-        if (!this.grid.isWinnable()) {
+        if (!this.grid.isWinnable() || !this.grid.cellsAvaiable()) {
             this.drawGame();
             return true;
         }
@@ -180,12 +180,6 @@ export default class gameFieldController {
         let isDone = this.grid.isDone();
         if (isDone) {
             this.endGame(isDone);
-            return true;
-        }
-
-        // Draw if there is no more avaiable cells
-        if (!this.grid.cellsAvaiable()) {
-            this.drawGame();
             return true;
         }
 

@@ -391,20 +391,23 @@ export default class Grid {
     getWinnableLanes(who) {
 
         let possibleWinLanes = [];
-
-        this.forEachLane((lane)=> {
-            if (!isUndefined(who) && !Grid.isLaneWinnableBy(who, lane)) {
-                return;
-            } else if (!Grid.isLaneWinnable(lane)) {
-                return;
-            }
-            possibleWinLanes.push(lane);
-        });
+        if (!isUndefined(who)) {
+            this.forEachLane((lane)=> {
+                if (Grid.isLaneWinnableBy(who, lane)) {
+                    possibleWinLanes.push(lane);
+                }
+            });
+        } else {
+            this.forEachLane((lane)=> {
+                if (Grid.isLaneWinnable(lane)) {
+                    possibleWinLanes.push(lane);
+                }
+            });
+        }
 
         if (possibleWinLanes.length) {
             return possibleWinLanes
         }
-
     }
 
     /**
