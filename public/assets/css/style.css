@@ -80,6 +80,7 @@ main > .container {
 
 .field--cell {
     display: inline-block;
+    vertical-align: top;
     position: relative;
     font-size: 20px;
     width: 40px;
