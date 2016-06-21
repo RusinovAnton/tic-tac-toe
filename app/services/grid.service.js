@@ -202,7 +202,7 @@ export default class Grid {
     }
 
     /**
-     *  @param lane {Array} pass flat array lane to find initEmpty cells in it (optional)
+     *  @param lane {Array} (optional) lane array or array of lane arrays to find empty cells in it
      *  @returns {Array} of initEmpty cells
      */
     getAvaiableCells(lane) {
@@ -210,6 +210,7 @@ export default class Grid {
         let avaiableCells = [];
 
         if (isArray(lane)) {
+            lane = flatten(lane);
             lane.forEach((cell)=> {
                 if (Grid.isEmpty(cell)) {
                     avaiableCells.push(cell);

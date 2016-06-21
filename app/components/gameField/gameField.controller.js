@@ -88,7 +88,6 @@ export default class gameFieldController {
         // Do nothing if choosen cell isn't empty already
         if (!Grid.isEmpty(this.grid.getCell(pos))) return;
 
-        this.enemy.storeUserMove(pos);
         this.grid.setCell(pos, new PlayerSign(pos));
 
         if (this.isGameEnded()) return;
