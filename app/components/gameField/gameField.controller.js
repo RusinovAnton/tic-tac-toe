@@ -90,6 +90,8 @@ export default class gameFieldController {
 
         this.grid.setCell(pos, new PlayerSign(pos));
 
+        console.log(JSON.stringify(this.grid.cells));
+
         if (this.isGameEnded()) return;
 
         // Change move turn

@@ -92,6 +92,16 @@ export default class TicTacToeGrid extends Grid {
     }
 
     /**
+     * Returns true if lane is winnable
+     * @param lane
+     * @returns {boolean}
+     */
+    static isLaneWinnable(lane) {
+        // Lane is empty or have signs of same kind
+        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
+    }
+
+    /**
      * Returns if lane is winnable by player or enemy
      * @param who {String} - 'player' or 'enemy' (default 'player')
      * @param lane
@@ -111,17 +121,7 @@ export default class TicTacToeGrid extends Grid {
     }
 
     /**
-     *
-     * @param lane
-     * @returns {boolean}
-     */
-    static isLaneWinnable(lane) {
-        // Lane is empty or have signs of same kind
-        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
-    }
-
-    /**
-     * Returns true if cell is empty
+     * Returns true if given cell is empty
      * @param cell {Object}
      * @returns {boolean}
      */
@@ -250,7 +250,7 @@ export default class TicTacToeGrid extends Grid {
     }
 
     /**
-     * returns array of lanes which is possible to win
+     * returns array of lanes which is impossible to win
      * @returns {Array}
      */
     getUnwinnableLanes() {
