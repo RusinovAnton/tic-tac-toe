@@ -8,7 +8,8 @@ import {PlayerSign, EnemySign} from '../../Sign';
 import {isUndefined} from 'lodash';
 
 function playersMove() {
-    return Math.random() >= 0.5;
+    // return Math.random() >= 0.5;
+    return true;
 }
 
 export default class gameFieldController {
@@ -85,9 +86,8 @@ export default class gameFieldController {
         if (this.gameEnded) return;
 
         // Do nothing if choosen cell isn't empty already
-        if (!this.grid.isEmpty(this.grid.getCell(pos))) return;
+        if (!Grid.isEmpty(this.grid.getCell(pos))) return;
 
-        this.enemy.storeUserMove(pos);
         this.grid.setCell(pos, new PlayerSign(pos));
 
         if (this.isGameEnded()) return;
@@ -170,6 +170,7 @@ export default class gameFieldController {
     isGameEnded() {
 
         // Draw when there is no way to win
+        // TODO: cache winnable lanes for user/enemy turns' cycle step
         if (!this.grid.isWinnable()) {
             this.drawGame();
             return true;

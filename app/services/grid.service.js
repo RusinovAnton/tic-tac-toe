@@ -2,14 +2,18 @@
 
 import {EmptySign} from '../Sign';
 
+import isUndefined from '../utils/isUndefined';
+
 import {
+    flatten,
     every,
     some,
     cloneDeep,
     isNumber,
+    isEqual,
     isArray,
     isObject,
-    isUndefined
+    intersectionWith
 } from 'lodash';
 
 export default class Grid {
@@ -18,6 +22,92 @@ export default class Grid {
         this.gridInit = false;
     }
 
+    /**
+     * Returns array of cells that happen in both given lane arrays
+     * @param array1
+     * @param array2
+     * @returns {Array}
+     */
+    static getLanesIntersections(array1, array2) {
+
+        if (!(isArray(array1) && isArray(array2))) {
+            return void 0;
+        }
+
+        array1 = flatten(array1);
+        array2 = flatten(array2);
+
+        let intersections = intersectionWith(array1, array2, isEqual);
+
+        return intersections.length ? intersections : void 0;
+    }
+
+    /**
+     * Returns if lane is winnable by player or enemy
+     * @param who {String} - 'player' or 'enemy' (default 'player')
+     * @param lane
+     * @returns {boolean}
+     */
+    static isLaneWinnableBy(who, lane) {
+
+        who = who || 'player';
+        let opposite = who === 'player' ?
+            'enemy' :
+            'player';
+
+        // Every lane is empty or lane has some signs of same kind
+        return every(lane, {body: 'empty'}) ||
+            (some(lane, {who: who}) && !some(lane, {who: opposite}));
+
+    }
+
+    /**
+     *
+     * @param lane
+     * @returns {boolean}
+     */
+    static isLaneWinnable(lane) {
+        // Lane is empty or have signs of same kind
+        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
+    }
+
+    /**
+     * Returns true if cell is empty
+     * @param cell {Object}
+     * @returns {boolean}
+     */
+    static isEmpty(cell) {
+        if (cell === void 0) {
+            throw new Error('Argument is undefined');
+        }
+        return cell.body === 'empty';
+    }
+
+    /**
+     * Returns winChance for given lane
+     * @param lane {Array}
+     * @returns {Number}
+     */
+    static getLaneWinChance(lane) {
+
+        if (!Grid.isLaneWinnable(lane)) return 0; // lane is unwinnable
+
+        let emptyCells = 0;
+
+        // Count lanes' empty cells
+        lane.forEach((cell)=> {
+            if (Grid.isEmpty(cell)) emptyCells++;
+        });
+
+        return (lane.length / emptyCells) / lane.length;
+    }
+
+    /**
+     * Initialize cells' array with given size or from previous state if given
+     * @param size
+     * @param prevState
+     * @returns {Promise}
+     */
     init(size, prevState) {
 
         if (!isNumber(size) && !prevState) throw new Error('Size must be a number');
@@ -25,16 +115,17 @@ export default class Grid {
         return new Promise((resolve, reject) => {
             try {
 
-                if (prevState === null || isUndefined(prevState)) {
+                if (!prevState) {
                     this.size = size;
-                    this.cells = this.empty(this.size);
+                    this.cells = this.initEmpty(this.size);
                 } else {
                     this.size = prevState.size;
                     this.prevState = prevState;
-                    this.cells = this.fromState();
+                    this.cells = this.initFromState();
                 }
 
                 this.gridInit = true;
+                // Return success if grid was initialized
                 resolve(this.gridInit);
 
             } catch (err) {
@@ -44,7 +135,11 @@ export default class Grid {
         });
     }
 
-    empty() {
+    /**
+     * Inits cells array with empty cells
+     * @returns {Array}
+     */
+    initEmpty() {
 
         let cells = [];
         var i, j;
@@ -58,7 +153,11 @@ export default class Grid {
         return cells;
     }
 
-    fromState() {
+    /**
+     * Inits cells array with cells from state
+     * @returns {Array}
+     */
+    initFromState() {
 
         let cells = [];
 
@@ -73,13 +172,12 @@ export default class Grid {
         return cells;
     }
 
-    isEmpty(cell) {
-        if (cell === void 0) {
-            throw new Error('Argument is undefined');
-        }
-        return cell.body === 'empty';
-    }
-
+    /**
+     * Sets body for needed cells'
+     * @param pos
+     * @param body
+     * @returns {boolean} true if set
+     */
     setCell(pos, body) {
 
         if (pos.x >= this.size || pos.y >= this.size) throw new Error('Unavaiable position');
@@ -94,29 +192,34 @@ export default class Grid {
 
     }
 
+    /**
+     * Returns' cell by position
+     * @param pos {Object} position object {x:, y:}
+     * @returns {*}
+     */
     getCell(pos) {
         return this.cells[pos.y][pos.x];
     }
 
     /**
-     *   Returns array of objects with coordinates of avaiable cells
-     *   e.g
-     *   [{x:0,y:3},{x:3,y:0},{x:6, y:0}]
+     *  @param lane {Array} (optional) lane array or array of lane arrays to find empty cells in it
+     *  @returns {Array} of initEmpty cells
      */
     getAvaiableCells(lane) {
 
         let avaiableCells = [];
 
         if (isArray(lane)) {
+            lane = flatten(lane);
             lane.forEach((cell)=> {
-                if (this.isEmpty(cell)) {
-                    avaiableCells.push(cell.pos);
+                if (Grid.isEmpty(cell)) {
+                    avaiableCells.push(cell);
                 }
             })
         } else {
             this.cells.forEach((row)=> {
                 row.forEach((cell)=> {
-                    if (this.isEmpty(cell)) avaiableCells.push(cell.pos);
+                    if (Grid.isEmpty(cell)) avaiableCells.push(cell);
                 })
             });
         }
@@ -125,7 +228,7 @@ export default class Grid {
     }
 
     /**
-     * True if there is avaiable cells
+     * True if there are cells avaiable
      *
      * @returns {boolean}
      */
@@ -169,11 +272,22 @@ export default class Grid {
         return diagonal;
     }
 
+    /**
+     * Returns needed row from grid by its' index
+     * @param index {Number}
+     * @returns {Array}
+     */
     getRow(index) {
         return this.cells[index];
     }
 
+    /**
+     * Returns' needed column from grid by its' index
+     * @param index
+     * @returns {Array}
+     */
     getColumn(index) {
+
         let col = [];
         // Iterates throw each grids' row and compose column array
         this.forEachRow((row)=> {
@@ -183,11 +297,15 @@ export default class Grid {
         return col;
     }
 
-    getDiagonals(index) {
-        return [
-            this.getFirstDiagonal(),
-            this.getSecondDiagonal()
-        ][index];
+    /**
+     * Returns' central cell or false if impossible
+     * @returns {Object || undefined}
+     */
+    getCenter() {
+
+        if (this.size % 2 === 0) return void 0;
+        return this.cells[(this.size - 1) / 2][(this.size - 1) / 2];
+
     }
 
     /**
@@ -197,7 +315,10 @@ export default class Grid {
      */
     forEachDiagonal(cb) {
         for (var i = 0; i < 2; i++) {
-            cb(this.getDiagonals(i), i, 'diagonal');
+            cb([
+                this.getFirstDiagonal(),
+                this.getSecondDiagonal()
+            ][i], i, 'diagonal');
         }
     }
 
@@ -239,7 +360,7 @@ export default class Grid {
     /**
      * Checks if there are lanes with all players' or all enemy's signs in it
      *
-     * @returns {bool} true if there are a winning lane
+     * @returns {bool} true if there is a winning lane
      */
     isDone() {
 
@@ -262,37 +383,48 @@ export default class Grid {
         return doneState || false;
     }
 
-    isLaneWinnableBy(who, lane) {
-
-        who = who || 'player';
-        let opposite = who === 'player' ?
-            'enemy' :
-            'player';
-
-        return (some(lane, {who: who}) && !some(lane, {who: opposite})) ||
-            every(lane, {body: 'empty'});
-
-    }
-
-    isLaneWinnable(lane) {
-        return !(some(lane, {who: 'player'}) && some(lane, {who: 'enemy'}));
-    }
-
-
+    /**
+     * returns array of lanes which is possible to win
+     * @param who {String} - 'player' || 'enemy' (optional) - get winnable lane by player or enemy only
+     * @returns {Array}
+     */
     getWinnableLanes(who) {
 
         let possibleWinLanes = [];
 
         this.forEachLane((lane)=> {
-            if (!isUndefined(who) && !this.isLaneWinnableBy(who, lane)) {
+            if (!isUndefined(who) && !Grid.isLaneWinnableBy(who, lane)) {
                 return;
-            } else if (!this.isLaneWinnable(lane)) {
+            } else if (!Grid.isLaneWinnable(lane)) {
                 return;
             }
             possibleWinLanes.push(lane);
         });
 
-        return possibleWinLanes;
+        if (possibleWinLanes.length) {
+            return possibleWinLanes
+        }
+
+    }
+
+    /**
+     * returns array of lanes which is possible to win
+     * @returns {Array}
+     */
+    getUnwinnableLanes() {
+
+        let impossibleWinLanes = [];
+
+        this.forEachLane((lane)=> {
+
+            if (!Grid.isLaneWinnable(lane)) {
+                impossibleWinLanes.push(lane);
+            }
+
+        });
+
+        return impossibleWinLanes;
+
     }
 
     /**
@@ -301,7 +433,7 @@ export default class Grid {
      * @returns {boolean}
      */
     isWinnable() {
-        return this.getWinnableLanes().length !== 0;
+        return this.getWinnableLanes() !== void 0;
     }
 
 }

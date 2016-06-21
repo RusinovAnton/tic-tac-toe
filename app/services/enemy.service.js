@@ -1,16 +1,25 @@
 'use strict';
 
+import Grid from '../services/grid.service';
+
+import isUndefined from '../utils/isUndefined';
+import allMaxBy from '../utils/allMaxBy.util';
+import randomInt from '../utils/randomInt';
+
+import {isArray} from 'lodash';
+
 import {
     some,
     max,
-    intersectionWith,
-    isEqual
+    maxBy,
+    flatten,
+    intersection
 } from 'lodash';
 
 export default class Enemy {
+
     constructor() {
         this._grid = null;
-        this.userMoves = [];
     }
 
     set grid(grid) {
@@ -19,150 +28,170 @@ export default class Enemy {
 
     move() {
 
-        var avaiableCell = this._grid.getAvaiableCells()[0];
-
-        let movePos = this.predictUserMove() ||
-            this.possibleWinMove() ||
-            {x: avaiableCell.x, y: avaiableCell.y};
+        let movePos = this.possibleWinMove();
 
         return new Promise((resolve, reject)=> {
+
+            if (!movePos) {
+                reject(new Error('There is no move position object'));
+            }
+
             // Setting timeout to mock enemys' thinking time
             setTimeout(()=> {
                 resolve(movePos);
             }, 500);
+
         });
 
     }
 
-    storeUserMove(pos) {
-        if (this.userMoves.length >= 2) {
-            this.userMoves.shift();
-        }
-        this.userMoves.push(pos);
-    }
-
-    predictUserMove() {
-        let vector;
-        let _self = this;
-
-        let prevMove = this.userMoves[0];
-        let lastMove = this.userMoves[1];
-
-        function isVector(vector) {
-            // Check if vector is valid. It can be -1, 0, 1
-            return (vector.x >= -1 && vector.x <= 1) && (vector.y >= -1 && vector.y <= 1) &&
-                // Check if cell choosen by vector is in the scope of _grid
-                (lastMove.x + vector.x >= 0 && lastMove.x + vector.x < _self._grid.size) && (lastMove.y + vector.y >= 0 && lastMove.y + vector.y < _self._grid.size) &&
-                // Check if cell is empty
-                (_self._grid.isEmpty(
-                        _self._grid.getCell(
-                            {
-                                x: lastMove.x + vector.x,
-                                y: lastMove.y + vector.y
-                            }
-                        )
-                    )
-                );
-        }
-
-        if (this.userMoves.length >= 2) {
-            vector = {
-                x: lastMove.x - prevMove.x,
-                y: lastMove.y - prevMove.y
-            };
-            if (isVector(vector)) {
-                return {x: lastMove.x + vector.x, y: lastMove.y + vector.y}
-            }
-        }
-
-        return false;
-    }
-
+    /**
+     * @returns {pos || false} position object ({x: , y: }) or false if there is no possible moves
+     */
     possibleWinMove() {
 
-        function getIntersections(userLanes, enemyLanes) {
+        // Take central cell if possible
+        let centerCell = this._grid.getCenter();
+        if (centerCell && Grid.isEmpty(centerCell)) return centerCell.pos;
 
-            let possibleWinMoves = [];
+        this.setCellChances();
 
-            userLanes.forEach((lane)=> {
-                enemyLanes.forEach((enemyLane)=> {
-                    possibleWinMoves = possibleWinMoves.concat(intersectionWith(lane, enemyLane, isEqual));
-                });
-            });
-
-            return possibleWinMoves;
-        }
-
-        let winPos;
-        let enemyWin = this.getWinLanes('enemy');
-        let userWin = this.getWinLanes('player');
-
-        if (enemyWin.lanes.length && userWin.lanes.length) {
-
-            winPos = getIntersections(userWin.lanes, enemyWin.lanes);
-            if (winPos.length) return winPos[0].pos;
-
-            if (userWin.rate > enemyWin.rate) {
-                winPos = this._grid.getAvaiableCells(userWin.lanes[0]);
-                return winPos[0];
-            } else {
-                winPos = this._grid.getAvaiableCells(enemyWin.lanes[0]);
-                return winPos[0];
-            }
-        }
-
-        let possibleMoves = [];
-
-        this._grid.getWinnableLanes('enemy').forEach((cell)=> {
-            if (this._grid.isEmpty(cell)) possibleMoves.push(cell);
-        });
-
-        if (possibleMoves.length) {
-            return possibleMoves[0].pos;
-        }
-
-        possibleMoves = [];
-
-        this._grid.getWinnableLanes('player').forEach((cell)=> {
-            if (this._grid.isEmpty(cell)) possibleMoves.push(cell);
-        });
-
-        if (possibleMoves.length) {
-            return possibleMoves[0].pos;
-        }
-
-        return false;
+        return this.getMaxChancePosition() || this.getIntersectionPosition() || this.getWinnablePosition();
 
     }
 
-    getWinLanes(who) {
+    getMaxChancePosition() {
 
-        let lanes = this._grid.getWinnableLanes(who);
+        this.maxChanceCells = this.getMaxChanceCells();
 
-        let chancesArray = [];
+        if (!this.maxChanceCells || !this.maxChanceCells.length) return false;
+
+        // if there is only one cell with max winChance
+        else if (this.maxChanceCells.length === 1) return this.maxChanceCells[0].pos;
+
+        // if there are cells which win game on next turn
+        else if (this.getMaxChance() === 1) {
+
+            let enemyMaxChanceLanes = this.getMaxChanceLanes('enemy');
+            let playerMaxChanceLanes = this.getMaxChanceLanes('player');
+
+            if (!isUndefined(enemyMaxChanceLanes)) {
+                // take Enemys' win cell - win!
+                return this._grid.getAvaiableCells(enemyMaxChanceLanes[0])[0].pos;
+            } else if (!isUndefined(playerMaxChanceLanes)) {
+                // Take Players win cell to prevent player from win
+                return this._grid.getAvaiableCells(playerMaxChanceLanes[0])[0].pos;
+            }
+        }
+    }
+
+    /**
+     * Returns position which is intersection of winnable lanes for enemy and player with maximum winChance if possible
+     * @returns {Object} position
+     */
+    getIntersectionPosition() {
+
+        let playerWinnableLanes = this._grid.getWinnableLanes('player');
+        let enemyWinnableLanes = this._grid.getWinnableLanes('enemy');
+
+        let playerMaxChanceLanes = playerWinnableLanes ? this.getMaxChanceLanes(playerWinnableLanes) : void 0;
+        let enemyMaxChanceLanes = enemyWinnableLanes ? this.getMaxChanceLanes(enemyWinnableLanes) : void 0;
+
+        let intersections = Grid.getLanesIntersections(playerMaxChanceLanes, enemyMaxChanceLanes) ||
+            Grid.getLanesIntersections(playerMaxChanceLanes, enemyWinnableLanes) ||
+            Grid.getLanesIntersections(playerWinnableLanes, enemyWinnableLanes);
+
+        if (intersections && intersections.length) return intersections[randomInt(0, intersections.length)].pos;
+    }
+
+    /**
+     * Returns position of avaiable winning cell, enemy's preferable
+     * @returns {Object} position
+     */
+    getWinnablePosition() {
+
+        let winnableLanes = this._grid.getWinnableLanes('enemy') || this._grid.getWinnableLanes();
+        let avaiableCells = this._grid.getAvaiableCells(winnableLanes);
+
+        let maxChanceCells = allMaxBy(avaiableCells, 'winChance');
+
+        if (maxChanceCells.length) {
+            return maxChanceCells[randomInt(0, maxChanceCells.length)].pos;
+        } else {
+            return avaiableCells[randomInt(0, avaiableCells.length)].pos;
+        }
+
+    }
+
+    /**
+     *  Sets winChance for each cell in the winnable lanes
+     */
+    setCellChances() {
+
+        // Clear previous winChances
+        this._grid.cells.forEach((lane)=> {
+            lane.forEach((cell)=> {
+                cell.winChance = null;
+            });
+        });
+
+        this._grid.getWinnableLanes().forEach((lane)=> {
+            let winChance = Grid.getLaneWinChance(lane);
+            lane.forEach((cell)=> {
+                if (Grid.isEmpty(cell)) cell.winChance = cell.winChance > winChance ? cell.winChance : winChance;
+            });
+        });
+
+    }
+
+    /**
+     *  Returns maximal winChance value
+     *  @returns {Number}
+     */
+    getMaxChance() {
+
+        let maxChanceCells = this.maxChanceCells || this.getMaxChanceCells();
+        return maxBy(maxChanceCells, 'winChance')['winChance'];
+
+    }
+
+    /**
+     * Returns array with cells that have max winChance
+     * @returns {Array}
+     */
+    getMaxChanceCells() {
+
+        let flattenGrid = flatten(this._grid.cells);
+        return allMaxBy(flattenGrid, 'winChance');
+
+    }
+
+    /**
+     * Returns array with lanes which have maximal winChance
+     * @param lanes {Array} (optional) array from which to find max winChance lanes
+     * @returns {Array}
+     */
+    getMaxChanceLanes(lanes) {
+
+        let maxChance = this.getMaxChance();
+        let maxChanceLanes = [];
+
+        lanes = isArray(lanes) ? lanes : this._grid.getWinnableLanes(lanes);
+        let chances = [];
 
         lanes.forEach((lane)=> {
+            chances.push(Grid.getLaneWinChance(lane));
+        });
 
-            let emptyCells = lane.filter((lane)=> {
-                return lane.body === 'empty';
+        if (chances.indexOf(maxChance) !== -1) {
+            chances.forEach((chance, i) => {
+                if (chance === maxChance) maxChanceLanes.push(lanes[i]);
             });
+        } else {
+            return void 0;
+        }
 
-            chancesArray.push((1 / (emptyCells.length / lane.length)).toFixed(2));
-
-        });
-
-        let maximal = max(chancesArray);
-        let winLanes = [];
-
-        chancesArray.forEach((el, i)=> {
-            if (el == maximal) winLanes.push(lanes[i]);
-        });
-
-        return {
-            lanes: winLanes,
-            rate: maximal
-        };
-
+        return maxChanceLanes;
     }
 
 }
