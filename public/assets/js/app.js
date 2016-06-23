@@ -32281,7 +32281,7 @@
 	
 	var gameFieldComponent = {
 	    templateUrl: 'templates/gameField.template.html',
-	    controller: ['$scope', '$routeParams', _gameField2.default]
+	    controller: ['$scope', '$routeParams', '$element', '$attrs', _gameField2.default]
 	};
 	
 	exports.default = gameFieldComponent;
@@ -32324,9 +32324,10 @@
 	}
 	
 	var gameFieldController = function () {
-	    function gameFieldController($scope, $routeParams) {
+	    function gameFieldController($scope, $routeParams, element, attrs) {
 	        _classCallCheck(this, gameFieldController);
 	
+	        element.addClass('test-class');
 	        this.$scope = $scope;
 	        this.apply = $scope.apply;
 	
@@ -32404,8 +32405,6 @@
 	            if (!_grid2.default.isEmpty(this.grid.getCell(pos))) return;
 	
 	            this.grid.setCell(pos, new _Sign.PlayerSign(pos));
-	
-	            console.log(JSON.stringify(this.grid.cells));
 	
 	            if (this.isGameEnded()) return;
 	

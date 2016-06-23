@@ -14,8 +14,9 @@ function playersMove() {
 
 export default class gameFieldController {
 
-    constructor($scope, $routeParams) {
+    constructor($scope, $routeParams, element, attrs) {
 
+        element.addClass('test-class');
         this.$scope = $scope;
         this.apply = $scope.apply;
 
@@ -89,8 +90,6 @@ export default class gameFieldController {
         if (!Grid.isEmpty(this.grid.getCell(pos))) return;
 
         this.grid.setCell(pos, new PlayerSign(pos));
-
-        console.log(JSON.stringify(this.grid.cells));
 
         if (this.isGameEnded()) return;
 
